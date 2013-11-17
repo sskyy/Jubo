@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <script src="./lib/snap.svg-min.js"></script>
+    <script src="./lib/avalon.js"></script>
+    <script src="./lib/jquery-1.10.2.min.js"></script>
+    <script src="./lib/underscore-min.js"></script>
+    <script src="./lib/head.core.min.js"></script>
+    <link href="./css/main.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+
+    <div class="left"></div>
+    <div class="right"  ms-controller="event">
+    	<div id="brief">
+    		<div id="title"	>{{title}}</div>
+    		<div id="intro">{{intro}}</div>
+    	</div>
+
+    	<div id="diagram" >
+    		<canvas id="myCanvas" width="1600" height="800"></canvas>
+    		<svg id="mySvg"></svg>
+    		<div id="myParams" ms-each-param="params" ms-attr-style="'height:'+domBottom+'px;'">
+                <div ms-attr-id="'param'+($index+1)" class="param" ms-attr-style="'left:'+($index*200+10)+'px;top:'+(100-(param.metric[currentMetric]-metricBottom)*100/(metricTop-metricBottom))+'%'">
+                    <div class="cover" ms-class="show:param.cover" ><img ms-src="param.cover"/></div>
+                    <div class="title">{{param.title}}</div>
+                    <div class="text">{{param.content}}</div>
+                    <div class="more">详</div>
+                </div>
+    		</div>
+
+    		<div id="dates" style="position:absolute;top:580px;left:10px;font-size:12px;">
+    		    <div style="position:absolute;left:50px;top:0px;color:#999;width:100px;text-align:center">8月1日</div>
+    		    <div style="position:absolute;left:150px;top:0px;color:#aaa;width:100px;text-align:center">1个月</div>
+    		    <div style="position:absolute;left:250px;top:0px;color:#999;width:100px;text-align:center">9月1日</div>
+                <div style="position:absolute;left:350px;top:0px;color:#aaa;width:100px;text-align:center">2个月</div>
+                <div style="position:absolute;left:450px;top:0px;color:#999;width:100px;text-align:center">11月1日</div>
+    		</div>
+    	</div>
+    </div>
+
+    <script>
+    avalon.require(['../app/main'],function(app){
+        app.render()
+    })
+    </script>
+</body>
+</html>
