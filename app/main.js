@@ -1,7 +1,7 @@
-define([], function() {
+define([], function(  ) {
     var exports = {};
  
-
+    //render BG
     exports.renderBg = (function(){
         var ctx = document.getElementById("myCanvas").getContext("2d");
 
@@ -71,7 +71,7 @@ define([], function() {
         }
     })()
 
-
+    var eventVm
     exports.renderDom = function( event, diagramArgs ){
         //todo 需要计算param的dom最低到哪个位置。
         var domBottom = 300,
@@ -80,12 +80,35 @@ define([], function() {
             metricTop = _.max(event.params.map(function(param){return param.metric[currentMetric]})),
             metricBottom = _.min(event.params.map(function(param){return param.metric[currentMetric]}))
 
-        var eventVm = avalon.define("event",function(vm){
+        eventVm = avalon.define("event",function(vm){
             _.extend( vm, event)
+            vm.params = standardParams( vm.params )
             vm.currentMetric = currentMetric
             vm.metricTop = metricTop
             vm.metricBottom = metricBottom
             vm.domBottom = domBottom
+            vm.currentParam = null
+            vm.detailParam = null
+
+            vm.active = function(){
+                for( var i=0,length=eventVm.params.length;i<length;i++){
+                    if( eventVm.params[i].id == this.$vmodel.param.id ){
+                        eventVm.currentParam = {
+                            index: i,
+                            param : eventVm.params[i].$model
+                        }
+                    }
+                }
+            }
+            vm.unactive = function(){
+                eventVm.currentParam= null
+            }
+            vm.setDetailParam = function(){
+                page(baseUrl+"/#aaaa")
+            }
+            vm.clearDetailParam = function(){
+                page(baseUrl)
+            }
         })
         avalon.scan()
 
@@ -108,6 +131,19 @@ define([], function() {
         $paramDoms.each(function(){
             diagramArgs.paramsPos[currentMetric].push( parseInt( $(this).position().top ) )
         })
+
+        function standardParams( params ){
+            var oneDay = 24*60*60*1000
+            for( var i=0,length=params.length;i<length;i++){
+                if( i > 0 ){
+                    params[i].fromLast = Math.ceil((params[i].time-params[i-1].time)/oneDay).toString()+'天'
+                }
+                params[i].timeText = moment(params[i].time).format('YYYY-MM-DD')
+
+                params[i].isActive = false
+            }
+            return params
+        }
         
     }
 
@@ -152,12 +188,10 @@ define([], function() {
         }
 
         function makePath( points ){
-            console.log( "M" + points.join(" L"))
             return "M" + points.join(" L")
         }
 
         return function( params, diagramArgs ){
-            console.log( diagramArgs)
             for( var i in diagramArgs.paramsPos){
                 var points = [];
                 if( diagramArgs.paramsPos[i].length != 0 ){
@@ -165,13 +199,11 @@ define([], function() {
                         points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
                          + " " 
                          + (diagramArgs.paramsPos[i][j]).toString())
-                        console.log( j,diagramArgs.wUnit,  diagramArgs.colOffset, (diagramArgs.paramsPos[i][j]).toString() )
                     }
                     renderPath( makePath(points),"#9AC600")
 
                 }
-                console.log( points)
-
+                // console.log( points)
             }
             // console.log( )
             // renderPath( "M100 250 L300 100 L550 400 L700 210","#9AC600")
@@ -179,88 +211,37 @@ define([], function() {
         }
     })()
 
-    exports.renderTimeAxis = (function(){
-       var setOpt = (function(){
-            var defaultOpt = {
-                stroke: "#fff",
-                strokeWidth: 2,
-                fill : '#fff'
-            }
-            return function( ele, opt ){
-                opt = opt || defaultOpt
-                ele.attr( opt )
-            }
-        })()
 
-        function yline( startX, startY, endY, opt){
-            var line = s.line(startX,startY, startX, endY)
-            setOpt( line, opt )
-            return line;
-        }   
 
-        function xline( startX, startY, endX, opt){
-            var line = s.line(startX,startY, endX, startY)
-            setOpt( line, opt )
-            return line;
-        }
 
-        function circle( x, y, r, opt){
-            var c = s.circle( x,y, r)
-            setOpt( c, opt)
-            return c
-        }
+    // function renderBracket( startX, startY, height, width ){
+    //     var qx1 = startX,
+    //         qy1 = startY + height/2,
+    //         xm1 = startX + width/4,
+    //         ym1 = startY + height/2,
+    //         qx2 = startX + width/2,
+    //         qy2 = startY + height/2
+    //         xm2 = xm1 + width/2,
+    //         ym2 = ym1,
+    //         bottomX = startX + width/2,
+    //         bottomY = startY + height,
+    //         endX = startX + width,
+    //         endY = startY;
 
-        function renderBracket( startX, startY, height, width ){
-            var qx1 = startX,
-                qy1 = startY + height/2,
-                xm1 = startX + width/4,
-                ym1 = startY + height/2,
-                qx2 = startX + width/2,
-                qy2 = startY + height/2
-                xm2 = xm1 + width/2,
-                ym2 = ym1,
-                bottomX = startX + width/2,
-                bottomY = startY + height,
-                endX = startX + width,
-                endY = startY;
+    //     var bracket = s.path([
+    //         "M"+startX,startY,
+    //         "Q"+qx1, qy1,
+    //         xm1, ym1,
+    //         "T"+bottomX,bottomY,
+    //         "Q"+qx2,qy2,
+    //         xm2,ym2,
+    //         "T"+endX,endY
+    //         ].join(" "))
 
-            var bracket = s.path([
-                "M"+startX,startY,
-                "Q"+qx1, qy1,
-                xm1, ym1,
-                "T"+bottomX,bottomY,
-                "Q"+qx2,qy2,
-                xm2,ym2,
-                "T"+endX,endY
-                ].join(" "))
+    //     setOpt(bracket,{fill:"none",stroke:"#ccc",stokeWidth:1})
+    // }
 
-            setOpt(bracket,{fill:"none",stroke:"#ccc",stokeWidth:1})
-        }
 
-        function renderTimeText( params ){
-
-        }
-
-        return function( params ){
-            renderTimeText( params )
-            // renderBracket(100, 550, 20, 200)
-            // renderBracket(300, 550, 20, 200)
-            // renderPath( "M100 250 L300 100 L550 400 L700 210","#9AC600")
-            // renderPath( "M100 350 L300 200 L550 100 L700 210", "#ddd")
-            // // yline( 300, 200, 550, {"strokeWidth":5, "stroke":"#afebed"})
-            // yline( 100, 200, 550, {"strokeWidth":2, "stroke":"#ddd"})
-            // yline( 300, 200, 550, {"strokeWidth":2, "stroke":"#ddd"})
-            // yline( 500, 300, 550, {"strokeWidth":2, "stroke":"#ddd"})
-            // // xline( 100, 550, 550, {"strokeWidth":5, "stroke":"#afebed"})
-            // xline( 100, 550, 550, {"strokeWidth":2, "stroke":"#ddd"})
-
-            // // circle( 100, 550, 5, {"strokeWidth":5, "fill":"#afebed"})
-            // circle( 100, 550, 5, {"strokeWidth":5, "fill":"#ddd"})
-            // circle( 300, 550, 5, {"strokeWidth":5, "fill":"#ddd"})
-            // // circle( 550, 550, 5, {"strokeWidth":5, "fill":"#afebed"})
-            // circle( 500, 550, 5, {"strokeWidth":5, "fill":"#ddd"})
-        }
-    })()
 
     function calDiagramArgs( event, calDiagramArgs ){
 
@@ -273,7 +254,9 @@ define([], function() {
             cols = params.length > containerGrid ? params.length + 1 : containerGrid,
             colOffset = wUnit/2,
             containerLines = parseInt((document.body.clientHeight-200)/hUnit),
-            lines = containerLines > 6 ? containerLines : 6,
+            //we don't support responsive diagram for 1st edition.
+            // lines = containerLines > 6 ? containerLines : 6,
+            lines = 6,
             lineOffset = hUnit/2,
             hContainer = 550,
             paramClass = 'param'
@@ -293,17 +276,32 @@ define([], function() {
 
     exports.render = function(){
         $.getJSON("./data/event.json").done(function( res ){
-            
-            console.log( head.screen )
             var diagramArgs = calDiagramArgs( res )
             exports.renderBg( diagramArgs )
             exports.renderDom( res, diagramArgs )
             exports.renderSvg( res, diagramArgs )
-            exports.renderTimeAxis( params)
+            // exports.renderTimeAxis( res.params)
         }).error(function( err ){
             console.log( 'err', err)
         })
     } 
+
+
+    //router
+    var baseUrl = "/E:/work/projects/Jubo/select.html"
+    page("*",function( context ){
+        console.log("don't go",arguments)
+        if( context.hash ){
+            $.getJSON("./data/detailParam.json").done(function(res){
+                eventVm.detailParam = res 
+                console.log( res )
+            })
+        }else if(eventVm){
+            eventVm.detailParam = null
+        }
+    })
+    page()
+
 
     return exports
 

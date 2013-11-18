@@ -55,6 +55,7 @@ html,body{
     overflow: hidden;
     overflow-y: scroll;
 }
+
 #brief{
     margin-bottom: 10px;
     margin: 10px 0px;
@@ -68,6 +69,7 @@ html,body{
     font-weight: bold;
     line-height: 30px;
     margin-bottom: 5px;
+    cursor: pointer;
 }
 #brief #intro{
     font-size: 14px;
@@ -79,7 +81,7 @@ html,body{
     position: relative;
     margin: 10px;
     /*background: #fff;*/
-    height: 900px;
+    min-height: 660px;
     /*box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);*/
 }
 #myCanvas{
@@ -133,6 +135,11 @@ html,body{
     color:#666;
     line-height: 160%;
 }
+
+.param:hover{
+    /*text-decoration: underline;*/
+    cursor: pointer;
+}
 .param .title{
     padding: 5px 5px 0px 5px;
     font-weight: bolder;
@@ -152,3 +159,70 @@ html,body{
     background: #9AC600;
 }
 
+#dates{
+    position:absolute;
+    top:580px;
+    left:10px;
+    font-size:12px;
+}
+
+#dates .time{
+    position: absolute;
+    top:0px;
+    color:#999;
+    width:100px;
+    text-align:center;
+}
+
+#dates .fromLast{
+    color:#aaa;
+}
+
+#brackets{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+
+#overview.shortcut{
+    width: 220px;
+    float: left;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+#overview.shortcut #myCanvas,#mySvg,#dates,#brackets{
+    display: none;
+}
+
+#overview.shortcut #diagram{
+    margin-left: 0;
+}
+
+#overview.shortcut #diagram #myParams{
+    position: relative;
+    height: auto !important;
+}
+
+#overview.shortcut #diagram .param{
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    margin-top: 10px;
+}
+
+#overview.shortcut #brief{
+    width: 160px;
+    margin: 10px 0px 0px 10px;
+}
+
+#overview.shortcut #brief #intro{
+    display: none
+}
+
+#detailParam{
+    margin-left: 230px;
+    padding: 10px;
+}
