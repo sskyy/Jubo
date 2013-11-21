@@ -20,12 +20,13 @@
         		<div id="intro">{{intro}}</div>
         	</div>
 
-        	<div id="diagram">
-        		<canvas id="myCanvas" width="1600" height="800"></canvas>
-        		<svg id="mySvg"></svg>
+        	<div id="diagram" ms-if="title">
+        		<canvas id="diagramBg" width="1600" height="800"></canvas>
+        		<svg id="metricLines">
+     
+                </svg>
 
-
-                <svg id="brackets" class="brackets" ms-if="currentParam">
+ <!--                <svg id="brackets" class="brackets" ms-if="currentParam">
                     <path ms-if="currentParam.index!=0" ms-attr-d="'M'+((currentParam.index)*200-100)+' 550 Q'+((currentParam.index)*200-100)+' 560 '+((currentParam.index)*200-50)+' 560 T'+((currentParam.index)*200)+' 570 Q'+((currentParam.index)*200)+' 560 '+((currentParam.index)*200+50)+' 560 T'+((currentParam.index)*200+100)+' 550'" fill="none" stroke="#cccccc" ></path>
                     <path ms-if="!(currentParam.index==params.length-1)" ms-attr-d="'M'+((currentParam.index)*200+100)+' 550 Q'+((currentParam.index)*200+100)+' 560 '+((currentParam.index)*200+150)+' 560 T'+((currentParam.index)*200+200)+' 570 Q'+((currentParam.index)*200+200)+' 560 '+((currentParam.index)*200+250)+' 560 T'+((currentParam.index)*200+300)+' 550'" fill="none" stroke="#cccccc" ></path>              
                     
@@ -35,7 +36,7 @@
                         ms-attr-y1="(1-(currentParam.param.metric[currentMetric]-metricBottom)/(metricTop-metricBottom))*domBottom" y2="550" stroke="#dddddd" style="stroke-width: 2px;"></line>
                     <line ms-if="currentParam.param&&!(currentParam.index==params.length-1)" ms-attr-x1="(currentParam.index+1)*200+100" ms-attr-x2="(currentParam.index+1)*200+100" 
                         ms-attr-y1="(1-(params[currentParam.index+1].metric[currentMetric]-metricBottom)/(metricTop-metricBottom))*domBottom" y2="550" stroke="#dddddd" style="stroke-width: 2px;"></line>
-                </svg>
+                </svg> -->
 
         		<div id="dates" ms-each-param="params">
                     <div class="time" ms-attr-style="'left:'+($index*200+50)+'px;'">{{param.timeText}}</div>
@@ -47,8 +48,8 @@
         		</div>
 
 
-                <div id="myParams" ms-each-param="params" ms-attr-style="'height:'+domBottom+'px;'">
-                    <div ms-attr-id="'param'+($index+1)" class="param" ms-attr-style="'left:'+($index*200+10)+'px;top:'+(100-(param.metric[currentMetric]-metricBottom)*100/(metricTop-metricBottom))+'%'" ms-mouseenter="active" ms-mouseleave="unactive" ms-click='setDetailParam'>
+                <div id="params" ms-each-param="params">
+                    <div ms-attr-id="'param'+($index+1)" ms-data-param="param" class="param" ms-mouseenter="active" ms-mouseleave="unactive" ms-click='setDetailParam'>
                         <div class="cover" ms-class="show:param.cover" ><img ms-src="param.cover"/></div>
                         <div class="title">{{param.title}}</div>
                         <div class="text">{{param.content}}</div>

@@ -16,6 +16,8 @@ define(['./diagram'], function( Diagram ) {
 
     var eventVm = avalon.define("event",function(vm){
         vm.params = []
+        vm.metrics = {}
+        vm.metricsKeys = []
         vm.title = null
         vm.intro = null
         vm.currentMetric = null
@@ -42,9 +44,16 @@ define(['./diagram'], function( Diagram ) {
             vm.currentParam = null
         }
 
+        vm.setMetric = function(){
+            vm.currentMetric = _.keys(vm.metrics)[0]
+        }
+
         vm.set = function( event ){
-            event.params = standardParams( event )
+            event.params = standardParams( event.params )
             _.extend( vm, event )
+            vm.currentMetric = event.args.defaultMetric
+            vm.metricsKeys = _.keys( event.metrics)
+            console.log( vm)
         }
     })
     avalon.scan()
@@ -75,7 +84,7 @@ define(['./diagram'], function( Diagram ) {
         })
 
         page("*",function(){
-            console.log("don't go")
+            // console.log("don't go")
         })
 
         page()

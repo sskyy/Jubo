@@ -11,9 +11,10 @@ define([], function(  ) {
             metrics : event.metrics,
             lines : 6,
             hContainer : 550,
-            paramClass : 'param',
-            canvasId : 'myCanvas',
-            svgId : 'mySvg'
+            hContainerbottom:10,
+            paramSelector : '.param',
+            bgSelector : '#diagramBg',
+            svgSelector : '#metricLines'
         } 
 
         args.containerGrid = parseInt(document.body.clientWidth/args.wUnit)
@@ -28,7 +29,7 @@ define([], function(  ) {
 
     //render BG
     var renderBg = function( diagramArgs ){
-        var ctx = document.getElementById( diagramArgs.canvasId ).getContext("2d");
+        var ctx = document.querySelector( diagramArgs.bgSelector ).getContext("2d");
         var defaultOpt = {
             lineWidth: 1,
             strokeStyle: 'rgb(255,255,255)',
@@ -96,8 +97,6 @@ define([], function(  ) {
             diagramArgs.hUnit/2 )
     }
 
-    var eventVm
-
     ////////////////////////////////////
     //TODO
     //计算DOM布局，要分metric！！！
@@ -105,94 +104,125 @@ define([], function(  ) {
 
     var renderDom = function( event, diagramArgs ){
         //todo 需要计算param的dom最低到哪个位置。
-        var domBottom = 300,
-            bottomPadding = 10,
-            currentMetric = event.defaultMetric || _.keys( event.metrics)[0],
-            metricTop = _.max(event.params.map(function(param){return param.metric[currentMetric]})),
-            metricBottom = _.min(event.params.map(function(param){return param.metric[currentMetric]}))
+        // var domBottom = 300,
+        //     bottomPadding = 10,
+        //     currentMetric = event.defaultMetric || _.keys( event.metrics)[0],
+        //     metricTop = _.max(event.params.map(function(param){return param.metric[currentMetric]})),
+        //     metricBottom = _.min(event.params.map(function(param){return param.metric[currentMetric]}))
 
-        eventVm = avalon.define("event",function(vm){
-            _.extend( vm, event)
-            vm.params = standardParams( vm.params )
-            vm.currentMetric = currentMetric
-            vm.metricTop = metricTop
-            vm.metricBottom = metricBottom
-            vm.domBottom = domBottom
-            vm.currentParam = null
-            vm.detailParam = null
+        // eventVm = avalon.define("event",function(vm){
+        //     _.extend( vm, event)
+        //     vm.params = standardParams( vm.params )
+        //     vm.currentMetric = currentMetric
+        //     vm.metricTop = metricTop
+        //     vm.metricBottom = metricBottom
+        //     vm.domBottom = domBottom
+        //     vm.currentParam = null
+        //     vm.detailParam = null
 
-            vm.active = function(){
-                for( var i=0,length=eventVm.params.length;i<length;i++){
-                    if( eventVm.params[i].id == this.$vmodel.param.id ){
-                        eventVm.currentParam = {
-                            index: i,
-                            param : eventVm.params[i].$model
-                        }
+        //     vm.active = function(){
+        //         for( var i=0,length=eventVm.params.length;i<length;i++){
+        //             if( eventVm.params[i].id == this.$vmodel.param.id ){
+        //                 eventVm.currentParam = {
+        //                     index: i,
+        //                     param : eventVm.params[i].$model
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     vm.unactive = function(){
+        //         eventVm.currentParam= null
+        //     }
+        //     vm.setDetailParam = function(){
+        //         page(baseUrl+"/#aaaa")
+        //     }
+        //     vm.clearDetailParam = function(){
+        //         page(baseUrl)
+        //     }
+        // })
+        // avalon.scan()
+
+        // var $paramDoms = $('.'+diagramArgs.paramClass)
+        // var bottomDom = _.max( $paramDoms, function( paramDom ){
+        //     // console.log( $(paramDom), $(paramDom).offset().top, $(paramDom).outerHeight(),$(paramDom).offset().top + $(paramDom).outerHeight())
+        //     return $(paramDom).offset().top + $(paramDom).outerHeight()
+        // })
+        // eventVm.domBottom = diagramArgs.hContainer - $(bottomDom).outerHeight() - bottomPadding;
+        // // console.log( eventVm.domBottom, diagramArgs.hContainer, $(bottomDom).outerHeight(), $(bottomDom))
+
+        // //TODO add param positionn to diagramArgs
+        // diagramArgs.domBottom = eventVm.domBottom
+        // diagramArgs.paramsPos = {}
+        // //init position data structure
+        // _.keys( event.metrics).map(function(metric){
+        //     diagramArgs.paramsPos[metric] = []
+        // })
+        // //fill positions group by metric
+        // $paramDoms.each(function(){
+        //     diagramArgs.paramsPos[currentMetric].push( parseInt( $(this).position().top ) )
+        // })
+
+        // function standardParams( params ){
+        //     var oneDay = 24*60*60*1000
+        //     for( var i=0,length=params.length;i<length;i++){
+        //         if( i > 0 ){
+        //             params[i].fromLast = Math.ceil((params[i].time-params[i-1].time)/oneDay).toString()+'天'
+        //         }
+        //         params[i].timeText = moment(params[i].time).format('YYYY-MM-DD')
+
+        //         params[i].isActive = false
+        //     }
+        //     return params
+        // }
+
+        var params = document.querySelectorAll(diagramArgs.paramSelector)
+        if( params.length!=0 && ! $(params[0]).data('position')){
+            diagramArgs.paramsPos = []
+            for( var j=0,length=event.metricsKeys.length;j<length;j++){
+                var metric = event.metricsKeys[j]
+                    metricTop = _.max(event.params.map(function(param){return param.metric[metric]})),
+                    metricBottom = _.min(event.params.map(function(param){return param.metric[metric]})),
+                    metricRange = metricTop - metricBottom,
+                    bottomDomHeight = $(_.min( params, function( param){ return param['data-param'].metric[metric]})).outerHeight()
+                
+                _.each(params, function( param, i){
+                    var paramVm = param['data-param'],
+                        paramMetric = paramVm.metric[metric],
+                        position = $(param).data('position') || {}
+
+                    position[metric] = {
+                        left : i*diagramArgs.wUnit+10,
+                        top : (metricTop - paramMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                     }
-                }
-            }
-            vm.unactive = function(){
-                eventVm.currentParam= null
-            }
-            vm.setDetailParam = function(){
-                page(baseUrl+"/#aaaa")
-            }
-            vm.clearDetailParam = function(){
-                page(baseUrl)
-            }
-        })
-        avalon.scan()
+                    $(param).data('position', position)
+                    // $(param).css({'visibility':'visible'})
 
-        var $paramDoms = $('.'+diagramArgs.paramClass)
-        var bottomDom = _.max( $paramDoms, function( paramDom ){
-            // console.log( $(paramDom), $(paramDom).offset().top, $(paramDom).outerHeight(),$(paramDom).offset().top + $(paramDom).outerHeight())
-            return $(paramDom).offset().top + $(paramDom).outerHeight()
-        })
-        eventVm.domBottom = diagramArgs.hContainer - $(bottomDom).outerHeight() - bottomPadding;
-        // console.log( eventVm.domBottom, diagramArgs.hContainer, $(bottomDom).outerHeight(), $(bottomDom))
-
-        //TODO add param positionn to diagramArgs
-        diagramArgs.domBottom = eventVm.domBottom
-        diagramArgs.paramsPos = {}
-        //init position data structure
-        _.keys( event.metrics).map(function(metric){
-            diagramArgs.paramsPos[metric] = []
-        })
-        //fill positions group by metric
-        $paramDoms.each(function(){
-            diagramArgs.paramsPos[currentMetric].push( parseInt( $(this).position().top ) )
-        })
-
-        function standardParams( params ){
-            var oneDay = 24*60*60*1000
-            for( var i=0,length=params.length;i<length;i++){
-                if( i > 0 ){
-                    params[i].fromLast = Math.ceil((params[i].time-params[i-1].time)/oneDay).toString()+'天'
-                }
-                params[i].timeText = moment(params[i].time).format('YYYY-MM-DD')
-
-                params[i].isActive = false
+                    // paramVm.el = {position:position}
+                    if( j == length-1 ){
+                        diagramArgs.paramsPos.push( position )
+                    }
+                })
             }
-            return params
         }
-        
+
+        _.each(params, function( param){
+            $(param).css( $(param).data('position')[event.currentMetric] )
+        })
+
+        return params
     }
 
     // must execute after renderDom, cause we need div.param position
-    var renderSvg = (function(){
-        var s = Snap("#mySvg")
+    var renderSvg = function(event, diagramArgs){
+        var s = Snap( diagramArgs.svgSelector)
 
-        var setOpt = (function(){
-            var defaultOpt = {
+        var setOpt = function(ele, opt){
+            ele.attr( _.extend({
                 stroke: "#fff",
                 strokeWidth: 2,
                 fill : '#fff'
-            }
-            return function( ele, opt ){
-                opt = opt || defaultOpt
-                ele.attr( opt )
-            }
-        })()
+            },opt))
+        }
 
         function yline( startX, startY, endY, opt){
             var line = s.line(startX,startY, startX, endY)
@@ -226,62 +256,29 @@ define([], function(  ) {
         //TODO
         //分Metric重新划线
         ///////////////////////////////////////////
+        console.log( event.metricsKeys)
+        event.metricsKeys.forEach(function(metric){
+            var points = [];
 
-        return function( params, diagramArgs ){
-            for( var i in diagramArgs.paramsPos){
-                var points = [];
-                if( diagramArgs.paramsPos[i].length != 0 ){
-                    for( var j in diagramArgs.paramsPos[i] ){
-                        points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
-                         + " " 
-                         + (diagramArgs.paramsPos[i][j]).toString())
-                    }
-                    renderPath( makePath(points),"#9AC600")
-
-                }
-                // console.log( points)
+            for( var i in diagramArgs.paramsPos ){
+                // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
+                //  + " " 
+                //  + (diagramArgs.paramsPos[i][j]).toString())
+                points.push( (diagramArgs.paramsPos[i][metric].left + diagramArgs.wUnit/2).toString() +" "+
+                    (diagramArgs.paramsPos[i][metric].top + 50).toString() )
             }
-            // console.log( )
-            // renderPath( "M100 250 L300 100 L550 400 L700 210","#9AC600")
-            // renderPath( "M100 350 L300 200 L550 100 L700 210", "#ddd")
-        }
-    })()
+            renderPath( makePath(points),"#9AC600")
 
+            console.log( points)
 
-
-
-    // function renderBracket( startX, startY, height, width ){
-    //     var qx1 = startX,
-    //         qy1 = startY + height/2,
-    //         xm1 = startX + width/4,
-    //         ym1 = startY + height/2,
-    //         qx2 = startX + width/2,
-    //         qy2 = startY + height/2
-    //         xm2 = xm1 + width/2,
-    //         ym2 = ym1,
-    //         bottomX = startX + width/2,
-    //         bottomY = startY + height,
-    //         endX = startX + width,
-    //         endY = startY;
-
-    //     var bracket = s.path([
-    //         "M"+startX,startY,
-    //         "Q"+qx1, qy1,
-    //         xm1, ym1,
-    //         "T"+bottomX,bottomY,
-    //         "Q"+qx2,qy2,
-    //         xm2,ym2,
-    //         "T"+endX,endY
-    //         ].join(" "))
-
-    //     setOpt(bracket,{fill:"none",stroke:"#ccc",stokeWidth:1})
-    // }
+        })
+    }
 
     exports.render = function( vmodel ){
         var diagramArgs = calDiagramArgs( vmodel )
         renderBg( diagramArgs )
-        // renderDom( vmodel, diagramArgs )
-        // renderSvg( vmodel, diagramArgs )
+        renderDom( vmodel, diagramArgs )
+        renderSvg( vmodel, diagramArgs )
     } 
 
     exports.preRender = function(){

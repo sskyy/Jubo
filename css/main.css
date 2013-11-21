@@ -84,19 +84,19 @@ html,body{
     min-height: 660px;
     /*box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);*/
 }
-#myCanvas{
+#diagramBg{
     position: absolute;
     top:10px;
     left:10px;
 }
-#mySvg{
+#metricLines{
     position: absolute;
     top:10px;
     left: 10px;
     width: 1000px;
     height: 800px;
 }
-#myParams{
+#params{
     position: absolute;
     top:10px;
     left: 10px;
@@ -106,6 +106,7 @@ html,body{
 }
 
 .param{
+    /*visibility: hidden;*/
     position: absolute;
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     width: 180px;

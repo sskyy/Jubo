@@ -45,5 +45,8 @@
     "metrics" : {
         "heat" : "热度",
         "pics" : "图片数"
+    },
+    "args" : {
+        "defaultMetric" : "heat"
     }
 }
