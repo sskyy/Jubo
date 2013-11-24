@@ -1,4 +1,4 @@
-define(['./diagram'], function( Diagram ) {
+define(['./diagram','./param'], function( Diagram, Param ) {
     var exports = {};
 
     function standardParams( params ){
@@ -14,72 +14,96 @@ define(['./diagram'], function( Diagram ) {
         return params
     }
 
-    var eventVm = avalon.define("event",function(vm){
-        vm.params = []
-        vm.metrics = {}
-        vm.metricsKeys = []
-        vm.title = null
-        vm.intro = null
-        vm.currentMetric = null
-        vm.currentParam = null
-        vm.detailParam = null
+    var vmodel = (function(){
+        var eventVm
+        return function(){
+            if( !eventVm){
+                eventVm = avalon.define("event",function(vm){
+                    vm.params = []
+                    vm.metrics = {}
+                    vm.metricsKeys = []
+                    vm.title = null
+                    vm.intro = null
+                    vm.currentMetric = null
+                    vm.currentParam = null
+                    vm.view = "overview"
 
-        vm.active = function(){
-            for( var i=0,length=eventVm.params.length;i<length;i++){
-                if( eventVm.params[i].id == this.$vmodel.param.id ){
-                    eventVm.currentParam = {
-                        index: i,
-                        param : eventVm.params[i].$model
+                    vm.active = function(){
+                        for( var i=0,length=eventVm.params.length;i<length;i++){
+                            if( eventVm.params[i].id == this.$vmodel.param.id ){
+                                eventVm.currentParam = {
+                                    index: i,
+                                    param : eventVm.params[i].$model
+                                }
+                            }
+                        }
                     }
-                }
+                    vm.unactive = function(){
+                        eventVm.currentParam= null
+                    }
+                    vm.gotoDetailParam = function(){
+                        vm.view = "detailParam"
+                        page('/event/'+eventVm.id+'/param/'+this['data-param'].id)
+                    }
+                    vm.gotoOverview = function(){
+                        vm.view = "overview"
+                        page('/event/'+eventVm.id)
+                        // console.log( eventVm)
+
+                    }
+
+                    vm.setMetric = function(){
+                        vm.currentMetric = _.keys(vm.metrics)[0]
+                    }
+
+                    vm.set = function( event ){
+                        vm.currentMetric = event.args.defaultMetric
+                        vm.metricsKeys = _.keys( event.metrics)
+                        event.params = standardParams( event.params )
+                        _.extend( vm, event )
+                    }
+                    vm.paramRendered = function(a){
+                        if( a == "add" && eventVm.params.length!==0){
+                            Diagram.render( eventVm )
+                        }
+                    }
+                })
+                return eventVm
             }
         }
-        vm.unactive = function(){
-            eventVm.currentParam= null
-        }
-        vm.setDetailParam = function(){
-            vm.currentParam = vm.params[0]
-        }
-        vm.clearDetailParam = function(){
-            vm.currentParam = null
-        }
+    })()
+    
 
-        vm.setMetric = function(){
-            vm.currentMetric = _.keys(vm.metrics)[0]
-        }
 
-        vm.set = function( event ){
-            event.params = standardParams( event.params )
-            _.extend( vm, event )
-            vm.currentMetric = event.args.defaultMetric
-            vm.metricsKeys = _.keys( event.metrics)
-            console.log( vm)
-        }
-    })
-    avalon.scan()
+    
 
     exports.run = function(){
+        var eventVm = vmodel(),
+            detailParam = Param.vmodel()
+        
+        avalon.scan()
+
         function loadEventQ( eid ){
-            return $.getJSON("./data/event.json")
+            return $.getJSON("/data/event.json")
         }
 
         function loadSegmentQ( pid ){
-            return $.getJSON("./data/detailParam.json")
+            return $.getJSON("/data/detailParam.json")
         
         }
 
         page("/event/:eid",function( ctx, next ){
             Diagram.preRender()
-            loadEventQ( ctx.params.eid ).done( function(res){
-                eventVm.set( res ) 
-                Diagram.render( eventVm )
-            })
-            next()
+            if( !eventVm.id ){
+                loadEventQ( ctx.params.eid ).done( function(res){
+                    eventVm.set( res ) 
+                })    
+            }
         })
 
         page("/event/:eid/param/:pid",function( ctx){
             loadSegmentQ( ctx.params.pid ).done( function( res ){
-                eventVm.detailParam = res
+                detailParam.set(res)
             })
         })
 
@@ -88,9 +112,11 @@ define(['./diagram'], function( Diagram ) {
         })
 
         page()
-
         page('/event/1')
+
+
     } 
+
 
     return exports
 
