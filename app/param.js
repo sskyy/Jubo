@@ -26,6 +26,11 @@ define([], function() {
                     vm.pics=[]
                     vm.currentPic=0
                     vm.content = ""
+                    vm.title = ""
+                    vm.author = {
+                        name : "",
+                        signature : ""
+                    }
                     vm.set = function( param){
                         _.extend( detailParam, param)
                     }

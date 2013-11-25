@@ -92,18 +92,24 @@ define(['./diagram','./param'], function( Diagram, Param ) {
         
         }
 
-        page("/event/:eid",function( ctx, next ){
+        page("/event/:eid/*",function( ctx, next ){
             Diagram.preRender()
+            console.log( "loading event")
             if( !eventVm.id ){
                 loadEventQ( ctx.params.eid ).done( function(res){
                     eventVm.set( res ) 
+                    next()
                 })    
             }
         })
 
-        page("/event/:eid/param/:pid",function( ctx){
+        page("/event/:eid/param/:pid",function( ctx,next){
+            console.log( "loading detailParam")
             loadSegmentQ( ctx.params.pid ).done( function( res ){
                 detailParam.set(res)
+                if( eventVm.view!='detailParam'){
+                    eventVm.gotoDetailParam()
+                }
             })
         })
 
@@ -112,7 +118,9 @@ define(['./diagram','./param'], function( Diagram, Param ) {
         })
 
         page()
-        page('/event/1')
+        // console.log( window.location)
+        // page('/event/1')
+        page(window.location.search.replace("?q=",""))
 
 
     } 

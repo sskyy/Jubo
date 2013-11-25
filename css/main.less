@@ -1,6 +1,6 @@
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 5px;
     height: 8px;
 }
 
@@ -12,7 +12,7 @@
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px;
     outline-offset: -2px;
-    border: 2px solid rgb(206, 206, 206);
+    border: 0px solid rgb(206, 206, 206);
     border-image-source: initial;
     border-image-slice: initial;
     border-image-width: initial;
@@ -21,7 +21,7 @@
 } 
 
 ::-webkit-scrollbar-track-piece {
-    background-color: rgb(206, 206, 206);
+    background-color: #ededef;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -52,14 +52,16 @@ html,body{
 .right{
     position: relative;
     height: 100%;
-    margin: 0 0 0px 210px;
+    margin: 0 0 0px 200px;
     overflow: hidden;
     overflow-y: hidden;
+    box-shadow: -2px 0 2px #333;
+
 }
 
 #brief{
     margin-bottom: 10px;
-    margin: 10px 0px;
+    margin: 10px;
     padding: 10px 10px 10px 10px;
     background: #fff;
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
@@ -193,10 +195,7 @@ html,body{
 }
 
 #overview{
-    ::-webkit-scrollbar {
-    width: 80px;
-    height: 8px;
-}
+
     position: absolute;
     left: 0;
     top: 0;
@@ -204,7 +203,7 @@ html,body{
     width: 100%;
     height: 100%;
     &.shortcut{
-        width: 220px;
+        width: 205px;
         overflow-y: scroll;
         overflow-x: hidden;
         -webkit-transition: all .5s;
@@ -235,92 +234,178 @@ html,body{
 
 #detailParam{
     position: relative;
-    margin-left: 220px;
+    margin-left: 205px;
     padding: 10px;
     height: 100%;
     background: #fff;
     overflow-x: hidden;
     overflow-y: scroll;
-    #slider{
-        max-width : 500px;
+    box-shadow:-2px 0px 5px #777;
+    &.detailParam{
+        z-index: 2;
     }
-
-    #detailParamContent{
+    #paramBody{
         width: 620px;
         margin: 0 auto;
-        font-size: 18px;
-        line-height: 30px;
-        margin-top: 10px;
-        p{
-            margin-bottom: 25px;
-        }
-    }
 
-    .pics{
-            width: 500px;
-            height: 250px;
+        #detailParamContent{
+            width: 100%;
             margin: 0 auto;
-            position: relative;
-            .slider .caption {
-            display: block;
-            position: absolute;
-            z-index: 2;
-            font-size: 20px;
-            text-shadow: none;
-            color: #fff;
-            background: #000;
-            background: rgba(0,0,0, .8);
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 10px 20px;
-            margin: 0;
-            max-width: none;
-        }
-
-        .slider_nav {
-            position: absolute;
-            -webkit-tap-highlight-color: rgba(0,0,0,0);
-            top: 52%;
-            left: 0;
-            opacity: 0.7;
-            z-index: 3;
-            text-indent: -9999px;
-            overflow: hidden;
-            text-decoration: none;
-            height: 61px;
-            width: 38px;
-            background: transparent url("img/themes.gif") no-repeat left top;
-            margin-top: -45px;
-        }
-
-        .slider_nav:active {
-            opacity: 1.0;
-        }
-
-        .slider_nav.next {
-            left: auto;
-            background-position: right top;
-            right: 0;
-        }
-
-        .picNav{
-            font-family: Georgia, 'Monotype Corsiva', Arial, sans-serif;
-            color:#fff;
-            position: absolute;
-            right: 10px;
-            bottom: 5px;
-            z-index: 3;
-            font-style: italic;
-            .picIndex{
-                color: #cc191b;
-                font-size: 36px;
+            font-size: 18px;
+            line-height: 30px;
+            margin-top: 10px;
+            padding-bottom: 50px;
+            font-family: Georgia,"Times New Roman",Times,"Songti SC","SimSun",serif;
+            color:#2f2f2f;
+            p{
+                margin-bottom: 25px;
             }
-            .picTotal{
-                font-size: 14px;
+        }
+
+        #paramAuthor{
+            position: absolute;
+            top:40px;
+            right: 1100px;
+            width: 160px;
+            text-align: right;
+            a{
+                color: #555;
+                text-decoration: none;
+            }
+            .name{
+                margin: 0;
+                font-size: 16px;
+                font-weight: bold;
+                line-height: 24px;
+
+            }
+            .avatar{
+                width: 60px;
+                height: 60px;
+                margin: 0 0 10px 0px;
+                display: inline-block;
+                // -webkit-border-radius: 50%;
+                // -moz-border-radius: 50%;
+                // border-radius: 50%;
+                border: 4px solid #fff;
+                -webkit-box-shadow: -1px 1px 6px rgba(0,0,0,0.35);
+                -moz-box-shadow: -1px 1px 6px rgba(0,0,0,0.35);
+                box-shadow: -1px 1px 6px rgba(0,0,0,0.35);
+                img{
+                    width: 100%;
+                    height: 100%;
+                    // -webkit-border-radius: 50%;
+                    // -moz-border-radius: 50%;
+                    // border-radius: 50%;
+                    -webkit-box-shadow: inset 1px 1px 3px rgba(0,0,0,0.35);
+                    -moz-box-shadow: inset 1px 1px 3px rgba(0,0,0,0.35);
+                    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.35);
+                }
+
+            }
+            .about {
+                font-family: "lucida grande","lucida sans unicode",lucida,"Helvetica Neue",helvetica,"Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+                color: #999;
+                font-size: 12px;
+            }
+            .sns {
+                margin-bottom: 10px;
+                a{
+                    width: 13px;
+                    margin-left: 7px;
+                    display: inline-block;
+                    img{
+                        max-width: 100%;
+                        width: auto\9;
+                        height: auto;
+                        vertical-align: middle;
+                        border: 0;
+                    }
+                }
+            }
+        }
+
+        #paramTitle{
+            font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
+            font-size: 50px;
+            font-weight: 700;
+            line-height: 70px;
+            margin-bottom: 20px;
+        }
+
+        #paramPics{
+                width: 100%;
+                height: 350px;
+                position: relative;
+                #slider{
+                    width : 100%;
+                    height: 100%;
+                    li{
+                        height: 100%;
+                    }
+                }
+                .slider .caption {
+                    display: block;
+                    position: absolute;
+                    z-index: 2;
+                    font-size: 20px;
+                    text-shadow: none;
+                    color: #fff;
+                    background: #000;
+                    background: rgba(0,0,0, .8);
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    padding: 10px 20px;
+                    margin: 0;
+                    max-width: none;
+                }
+
+            .slider_nav {
+                position: absolute;
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+                top: 52%;
+                left: 0;
+                opacity: 0.7;
+                z-index: 3;
+                text-indent: -9999px;
+                overflow: hidden;
+                text-decoration: none;
+                height: 61px;
+                width: 38px;
+                background: transparent url("img/themes.gif") no-repeat left top;
+                margin-top: -45px;
+            }
+
+            .slider_nav:active {
+                opacity: 1.0;
+            }
+
+            .slider_nav.next {
+                left: auto;
+                background-position: right top;
+                right: 0;
+            }
+
+            .picNav{
+                font-family: Georgia, 'Monotype Corsiva', Arial, sans-serif;
+                color:#fff;
+                position: absolute;
+                right: 10px;
+                bottom: 5px;
+                z-index: 3;
+                font-style: italic;
+                .picIndex{
+                    color: #cc191b;
+                    font-size: 36px;
+                }
+                .picTotal{
+                    font-size: 14px;
+                }
             }
         }
     }
+    
 
 
 }

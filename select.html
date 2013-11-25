@@ -17,9 +17,25 @@
     <div class="left"></div>
     <div class="right" ms-controller="event">
         <div id="detailParam" ms-attr-class="(view=='detailParam'&&'detailParam')" ms-controller="detailParam">
-            <div >
-                <div class="pics" >
-                  <ul class="rslides" id="slider" ms-each-pic="pics" data-each-rendered="detailParamRendered">
+            <div id="paramBody">
+                <div id="paramAuthor">
+                    <a href="/users/s27zLn" class="author name">
+                      <div class="avatar">
+                        <img alt="0" src="http://tp3.sinaimg.cn/1221788390/180/1289279591/0">
+                      </div>
+                      <br>
+                        {{author.name}}
+                    </a>      
+                    <div class="about">
+                      <p class="intro">{{author.signature}}</p>
+                    </div>
+                    <div class="sns">
+                      <a href="http://site.douban.com/cctvjz/"><i class="icon-home"></i></a><a href="http://weibo.com/u/1221788390" target="_blank"><img alt="Weibo_48" src="http://assets2.jianshu.io/assets/weibo_48-ecf8fc75c0b7211b0ecad85ce23eb1fe.png"></a><a href="http://www.douban.com/people/23446096" target="_blank"><img alt="Douban_48" src="http://assets3.jianshu.io/assets/douban_48-be5d39195c94e54ddf7077ed2fa27901.png"></a>
+                    </div>
+                </div>
+                <div id="paramTitle">{{title}}</div>
+                <div id="paramPics" ms-if="view=='detailParam'">
+                  <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
                     <li>
                       <img ms-src="pic.addr" alt="">
                       <p class="caption">{{pic.des}}</p>
