@@ -48,11 +48,17 @@
                 <div id="detailParamContent">{{content}}</div>
             </div>
         </div>
-        <div id="overview" ms-attr-class="(view=='detailParam'&&'shortcut')">
+        <div id="newParam" ms-attr-class="(view=='newParam'&&'newParam')">
+            <input type="text" id="newParamTitle" placeholder="标题">
+            <div id="">创建相册</div>
+            <div id="newParamContent">内容</div>
+        </div>
+        <div id="overview" ms-attr-class="(view!='overview'&&'shortcut')">
         	<div id="brief"  ms-click='gotoOverview'>
         		<div id="title">{{title}}</div>
         		<div id="intro">{{intro}}</div>
         	</div>
+            <div ms-click='gotoParamAdd'>Create Param</div>
 
         	<div id="diagram" ms-if="title">
         		<canvas id="diagramBg" width="1600" height="800"></canvas>

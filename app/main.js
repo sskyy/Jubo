@@ -49,7 +49,11 @@ define(['./diagram','./param'], function( Diagram, Param ) {
                         vm.view = "overview"
                         page('/event/'+eventVm.id)
                         // console.log( eventVm)
-
+                    }
+                    vm.gotoParamAdd = function(){
+                        vm.view = "newParam"
+                        console.log( "gotoParamAdd")
+                        page('/event/'+eventVm.id+'/param/add')
                     }
 
                     vm.setMetric = function(){
@@ -92,19 +96,33 @@ define(['./diagram','./param'], function( Diagram, Param ) {
         
         }
 
-        page("/event/:eid/*",function( ctx, next ){
-            Diagram.preRender()
+        page("/event/:eid",function( ctx, next ){
             console.log( "loading event")
+            Diagram.preRender()
             if( !eventVm.id ){
                 loadEventQ( ctx.params.eid ).done( function(res){
                     eventVm.set( res ) 
-                    next()
                 })    
             }
         })
 
+        page("/event/:eid/param/add",function(){
+            console.log("adding param")
+            if(eventVm.view!='newParam'){
+                console.log("goto param add")
+                eventVm.gotoParamAdd()
+            }
+            return 
+        })
+
         page("/event/:eid/param/:pid",function( ctx,next){
-            console.log( "loading detailParam")
+            Diagram.preRender()
+            if( !eventVm.id ){
+                loadEventQ( ctx.params.eid ).done( function(res){
+                    eventVm.set( res ) 
+                })    
+            }
+
             loadSegmentQ( ctx.params.pid ).done( function( res ){
                 detailParam.set(res)
                 if( eventVm.view!='detailParam'){
@@ -113,13 +131,15 @@ define(['./diagram','./param'], function( Diagram, Param ) {
             })
         })
 
+
+
         page("*",function(){
-            // console.log("don't go")
+            console.log("don't go, route *")
         })
 
         page()
         // console.log( window.location)
-        // page('/event/1')
+
         page(window.location.search.replace("?q=",""))
 
 

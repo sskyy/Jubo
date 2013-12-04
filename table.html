@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf8">
+    <script src="./lib/jquery-1.10.2.min.js"></script>
+    <script src="./lib/underscore-min.js"></script>
+
+    <style>
+
+    body{
+        background: #fff;
+    }
+
+    table{
+        width: 800px;
+        margin: 100px auto 0 auto;
+        border-spacing: 0px
+    }
+
+    th .head{
+        display: block;
+        line-height: 40px;
+        border-right: 1px solid #3a3535;
+        border-bottom: 1px solid #3a3535;
+        border-top: 1px solid #3a3535;
+        font-size:14px;
+        font-weight: bolder;
+        color :#fff;
+        background: #3a3535;
+        overflow: hidden;
+    }
+    td,th{
+        border-width: 0;
+        padding: 0;
+        margin: 0;
+    }
+    th:first-child{
+        border-left:1px solid #3a3535;
+    }
+
+    td:first-child .metric{
+        padding-left: 14px; 
+    }
+    td:last-child .metric{
+        padding-right: 14px;
+    }
+    td .metric{
+        display: block;
+        padding: 0 10px;
+        line-height: 40px;
+        height: 40px;
+        font-size: 12px;
+        color:#666;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        /*box-sizing:border-box;*/
+    }
+    td:first-child .metric{
+        border-left:1px solid #ccc;
+    }
+    tr:hover,tr.active{
+        background: #e5f7fb
+    }
+
+    .active td .metric{
+        /*height: 36px;*/
+    }
+    .active td:first-child{
+        border-left:4px solid #66d5ed;
+    }
+    .active td:first-child .metric{
+        border-left-width:0px;
+        padding-left: 10px;
+    }
+    .active td:last-child{
+        border-right:4px solid #66d5ed;
+    }
+    .active td:last-child .metric{
+        border-right :0px;
+        padding-right: 10px;
+    }
+
+
+    .activefirst td{
+        border-top: 4px solid #66d5ed;
+    }
+    .activefirst td .metric{
+        height: 38px;
+        line-height: 36px;
+    }
+    .activelast td{
+        border-bottom: 4px solid #66d5ed;
+    }
+    .activelast td .metric{
+        border-bottom-width:0px; 
+        height: 39px;
+    }
+
+    .activefirst.activelast td .metric{
+        height: 37px;
+    }
+
+    .activebefore td .metric{
+        border-bottom-width:0; 
+        height: 39px;
+    }
+    .activeafter td .metric{
+        height: 38px;
+        line-height: 36px;
+    }
+    .activetop th .head{
+        border-bottom-width: 0px;
+        height: 39px;
+    }
+
+    .activebefore.activeafter td .metric{
+        height: 37px;
+    }
+
+    .metricCheck{
+        width: 50px;
+    }
+    </style>
+</head>
+<body>
+
+    <table ms-controller="table" class="table">
+        <thead class="heads">
+            <tr ms-with="data[0]" 
+                ms-class-activetop = "data[0].__active>0">
+                <th ms-if="$key=='id'">
+                    <span class="head"><input  ms-click="checkAll()" ms-checked="allChecked" type="checkbox"></span>
+                </th>
+                <th ms-if="!/^__/.test($key)"><span class="head">{{$key}}</span></th>
+            </tr>
+        </thead>
+        <tbody class="rows" ms-each-row="data" data-each-rendered="renderCount">
+            <tr class="row" ms-with="row" ms-click="check($index)" 
+                ms-class-activefirst="firstActive(row, data[$index-1])"
+                ms-class-active="row.__active>0"
+                ms-class-activelast="lastActive(row,data[$index+1])"
+                ms-class-activebefore="beforeActive(row, data[$index+1])"
+                ms-class-activeafter="afterActive(row, data[$index-1])">
+                <td ms-if="$key=='id'">
+                    <span class="metric">
+                        <input class="metricCheck" type="checkbox" ms-checked="weight(row)>0" ms-click="mltCheck($index,$event)">
+                    </span>
+                </td>
+                <td ms-if="!/^__/.test($key)">
+                    <span class="metric">{{$val}}</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="./lib/avalon.js"></script>
+    <script>
+    var data = [
+        {id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"},{id:"c",name:"linux",time:1386034741335,status:"error",flavor:"tiny"},{id:"d",name:"mac",time:1386024741335,status:"active",flavor:"tiny"},{id:"e",name:"fedora",time:1386074741335,status:"error",flavor:"medium"},{id:"f",name:"centos",time:1386094741335,status:"active",flavor:"medium"},{id:"g",name:"debian",time:1386084741335,status:"active",flavor:"tiny"},{id:"a",name:"windows",time:1386054741335,status:"active",flavor:"tiny"},{id:"b",name:"ubuntu",time:1386064741335,status:"active",flavor:"large"}
+    ]
+
+    console.log("data.length",data.length)
+
+    var model  = avalon.define('table',function(vm){
+        vm.data = data.map(function( row){
+            row.__active = 0
+            return row
+        })
+        /* 权重算法：
+            每行选中的权重总和必须为3。以下三种情况会给该行加权重。
+            1.自己被选中 +1
+            2.前面或后面的被选中 +1
+            3.自己被单选  +3
+        */
+        //single select
+        vm.check = function(index){
+            // console.log( "single select",index )
+            if( model.data[index].__active == 3 ){
+                return
+            }
+
+            model.data.forEach(function( row, i){
+                if( i == index ){
+                    row.__active = 3
+                }else{
+                    row.__active = 0
+                }
+            })
+            // console.log( _.pluck( model.data,"__active").join(","))
+        }
+
+        function weight( row, weight ){
+            if( weight === undefined ){
+                return row == undefined ? 0 : row.__active
+            }else{
+                if( row === undefined ){
+                    console.log("row cannot be undefined")
+                    return false
+                }
+                row.__active = weight
+                return weight
+            }
+        }
+
+        function weightb( row ){
+            // console.log( "weight", row.id, row.__active)
+
+            return weight( row )
+        }
+
+        function radiate( row ){
+            return weight(row)> 0 ? 1 : 0
+        }
+
+        vm.mltCheck = function( index, e){
+            // console.log("multi select", index)
+
+            if( model.data[index].__active == 0 ){
+
+                if( weight(model.data[index-1])>0){
+                    model.data[index-1].__active--
+                }
+                if( weight(model.data[index+1])>0){
+                    model.data[index+1].__active--
+                }
+
+                model.data[index].__active = 3-radiate(model.data[index-1])-radiate(model.data[index+1])
+
+            }else{
+
+                if( model.data[index].__active == 2 ){
+                    if( weight(model.data[index-1]) > 0 ) {
+                        model.data[index-1].__active++
+                    }
+                    if( weight(model.data[index+1]) > 0 ) {
+                        model.data[index+1].__active++
+                    }
+                }else if( weight(model.data[index]) == 1){
+                    model.data[index-1].__active++
+                    model.data[index+1].__active++
+                }
+                model.data[index].__active = 0
+            }
+            e.stopPropagation()
+            // e.preventDefault()
+            // console.log( _.pluck( model.data,"__active").join(","))
+        }
+
+        vm.allChecked = false
+        vm.checkAll = function(){
+            console.log("all active")
+            if( model.allChecked ){
+                model.data.forEach(function( row, i){
+                    row.__active = 0
+                })
+                model.allChecked = false
+            }else{
+                model.data.forEach(function( row, i){
+                    if( i == 0 &&row.__active!==2){
+                        row.__active = 2
+                    }else if( i==model.data.length-1 && row.__active!==2){
+                        row.__active = 2
+                    }else{
+                        row.__active = 1
+                    }
+                })
+                model.allChecked = true
+            }
+        }
+
+        vm.firstActive = function( row, preRow ){
+            var wRow = weight(row) ,
+                preRow = weight( preRow )
+            return wRow > 1 && preRow==0
+        }
+
+        vm.lastActive = function( row, nextRow){
+            var wRow = weight(row) ,
+                wNextRow = weight( nextRow )
+            return wRow > 1 && wNextRow == 0
+        }
+
+        vm.beforeActive = function( row, nextRow ){
+            var wRow = weight(row) ,
+                wNextRow = weight( nextRow )
+            return wRow==0&&wNextRow>1
+        }
+
+        vm.afterActive = function( row, preRow){
+            var wRow = weight(row) ,
+                preRow = weight( preRow )
+            return wRow==0&&preRow>1
+        }
+
+        vm.weight = weight
+        vm.radiate = radiate
+
+        vm.renderCount = (function(){
+            var i = 0,
+                start,
+                end
+
+            return function(){
+                if( i == 0){
+                    start = new Date().getTime()
+                }
+                if( i == model.data.length-1){
+                    console.log( (new Date().getTime() - start )/1000 )
+                }
+                i++
+                console.log( $(".row").last().html())
+            }
+        })()
+    })
+    // console.log( model.data)
+    avalon.scan()
+
+
+    </script>
+</body>
+</html>
