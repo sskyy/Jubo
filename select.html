@@ -8,13 +8,22 @@
     <script src="./lib/head.core.min.js"></script>
     <script src="./lib/moment-with-langs.js"></script>
     <script src="./lib/page.js"></script>
+    <script src="./lib/pen/pen.js"></script>
     <script src="./lib/responsiveslides.js"></script>
     <link href="./css/main.css" type="text/css" rel="stylesheet"/>
     <link href="./css/responsiveslide.css" type="text/css" rel="stylesheet"/>
+    <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
 </head>
-<body>
+<body ms-controller="general">
+    <div class="left">
+        <div class="info"></div>
+        <div class="navs">
+            <a class="viewMode" href="/event/1">时光旅行</a>
+            <a class="viewMode" href="/create/event">创建事件</a>
+            <a class="viewMode" href="/create/param">创建片段</a>
+        </div>
+    </div>
 
-    <div class="left"></div>
     <div class="right" ms-controller="event">
         <div id="detailParam" ms-attr-class="(view=='detailParam'&&'detailParam')" ms-controller="detailParam">
             <div id="paramBody">
@@ -33,7 +42,7 @@
                       <a href="http://site.douban.com/cctvjz/"><i class="icon-home"></i></a><a href="http://weibo.com/u/1221788390" target="_blank"><img alt="Weibo_48" src="http://assets2.jianshu.io/assets/weibo_48-ecf8fc75c0b7211b0ecad85ce23eb1fe.png"></a><a href="http://www.douban.com/people/23446096" target="_blank"><img alt="Douban_48" src="http://assets3.jianshu.io/assets/douban_48-be5d39195c94e54ddf7077ed2fa27901.png"></a>
                     </div>
                 </div>
-                <div id="paramTitle">{{title}}</div>
+                <div class="paramTitle">{{title}}</div>
                 <div id="paramPics" ms-if="view=='detailParam'">
                   <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
                     <li>
@@ -48,17 +57,12 @@
                 <div id="detailParamContent">{{content}}</div>
             </div>
         </div>
-        <div id="newParam" ms-attr-class="(view=='newParam'&&'newParam')">
-            <input type="text" id="newParamTitle" placeholder="标题">
-            <div id="">创建相册</div>
-            <div id="newParamContent">内容</div>
-        </div>
-        <div id="overview" ms-attr-class="(view!='overview'&&'shortcut')">
-        	<div id="brief"  ms-click='gotoOverview'>
-        		<div id="title">{{title}}</div>
+
+        <div id="overview" ms-attr-class="(view=='detailParam'&&'shortcut')">
+        	<div id="brief"  >
+        		<div id="title"><a ms-attr-href="'/event/'+id">{{title}}</a></div>
         		<div id="intro">{{intro}}</div>
         	</div>
-            <div ms-click='gotoParamAdd'>Create Param</div>
 
         	<div id="diagram" ms-if="title">
         		<canvas id="diagramBg" width="1600" height="800"></canvas>
@@ -85,19 +89,35 @@
 
 
                 <div id="params" ms-each-param="params" data-each-rendered="paramRendered">
-                    <div ms-attr-id="'param'+($index+1)" ms-data-param="param" class="param" ms-mouseenter="active" ms-mouseleave="unactive" ms-click='gotoDetailParam'>
+                    <a ms-attr-id="'param'+($index+1)" ms-data-param="param" class="param" ms-mouseenter="active(param)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/param/'+param.id">
                         <div class="cover" ms-class="show:param.cover" ><img ms-src="param.cover"/></div>
                         <div class="title">{{param.title}}</div>
                         <div class="text">{{param.content}}</div>
                         <div class="more">!</div>
-                    </div>
+                    </a>
                 </div>
         	</div>
         </div>
 
+        <div id="newParam" ms-class="show:viewMode=='newParam'" ms-controller="createParam">
+            <div id="newParamForm">
+                <input type="text" id="newParamTitle" placeholder="标题" ms-duplex="newTitle">
+                <div id="newParamAlbum">创建相册</div>
+                <div id="newParamMenu"></div>
+                <div id="newParamContent">内容</div>
+                <div class="">
+                    <a class="btn" ms-click="publish">发布</a>
+                </div>
+                <!-- <input type="text" class="title" placeholder="标题" ms-value="title"> -->
+                <div class="paramTitle">{{newTitle}}</div>
+                <div id="newParamPreview" class="pen"></div>
+            </div>
+
+        </div>
+
     </div>
 
-    <script src="./lib/avalon.js"></script>
+    <script src="./lib/avalon.0981.js"></script>
     <script>
     avalon.require(['../app/main'],function(app){
         app.run()

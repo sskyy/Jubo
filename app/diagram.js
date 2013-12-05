@@ -107,13 +107,13 @@ define([], function(  ) {
 
     var renderDom = function( event, diagramArgs ){
         var params = document.querySelectorAll(diagramArgs.paramSelector),
-            isDetailParamSet = (event.view=="detailParam") ? true:false,
-            positionKey = isDetailParamSet ? 'position' : 'shortcut-position'
+            isShortcutModel = (event.view!="overview") ? true:false,
+            positionKey = isShortcutModel ? 'position' : 'shortcut-position'
 
-            console.log("isDetailParamSet"  ,isDetailParamSet)
+            // console.log("isShortcutModel"  ,isShortcutModel)
         if( params.length!=0 && !$(params[0]).data(positionKey)){
             diagramArgs.paramsPos = []
-            if( !isDetailParamSet ){
+            if( !isShortcutModel ){
                 for( var j=0,length=event.metricsKeys.length;j<length;j++){
                     var metric = event.metricsKeys[j]
                         metricTop = _.max(event.params.map(function(param){return param.metric[metric]})),
@@ -141,8 +141,8 @@ define([], function(  ) {
                     })
                 }
             }else{
-                _.each(params, (function( ){
-                    // console.log( $(params[i-1]).outerHeight() +10)
+                _.each(params, (function( param, i ){
+                    console.log( "param outerHeight",$(params[i]).outerHeight() +10)
                     var stack = 0
                     return function( param, i){
                         $(param).data(positionKey, {
@@ -156,7 +156,7 @@ define([], function(  ) {
         }
 
         _.each(params, function( param){
-            if( !isDetailParamSet ){
+            if( !isShortcutModel ){
                 $(param).css( $(param).data(positionKey)[event.currentMetric] )
             }else{
                 $(param).css( $(param).data(positionKey) )
@@ -167,101 +167,119 @@ define([], function(  ) {
     }
 
     // must execute after renderDom, cause we need div.param position
-    var renderSvg = function(event, diagramArgs){
-        var s = Snap( diagramArgs.svgSelector)
+    var renderSvg = (function(){
+        var rendered = false
+        return function(event, diagramArgs){
+            if( rendered || event.view != 'overview'){
+                return
+            }
+            var s = Snap( diagramArgs.svgSelector)
 
-        var setOpt = function(ele, opt){
-            ele.attr( _.extend({
-                stroke: diagramArgs.metricColor,
-                strokeWidth: 5,
-                r:4,
-                strokeOpacity : 0.5,
-                fill : 'none'
-            },opt))
-        }
-
-        function yline( startX, startY, endY, opt){
-            var line = s.line(startX,startY, startX, endY)
-            setOpt( line, opt )
-            return line;
-        }   
-
-        function xline( startX, startY, endX, opt){
-            var line = s.line(startX,startY, endX, startY)
-            setOpt( line, opt )
-            return line;
-        }
-
-        function circle( x, y, r, opt){
-            console.log( )
-            var c = s.circle( x,y,r)
-            setOpt( c, opt)
-            return c
-        }
-
-        function makePath( points ){
-            return "M" + points.map( function(point){
-                return point.toString() + " " +point.toString()
-            }).join(" L")
-        }
-
-        function renderPath( points, current ){
-            var pathStr = makePath(points)
-            var path = s.path( pathStr )
-            var opt = {}
-            if( current ){
-                opt.stroke = diagramArgs.currentMetricColor
+            var setOpt = function(ele, opt){
+                ele.attr( _.extend({
+                    stroke: diagramArgs.metricColor,
+                    strokeWidth: 5,
+                    r:4,
+                    strokeOpacity : 0.5,
+                    fill : 'none'
+                },opt))
             }
 
-            setOpt( path, opt)
-            //TODO add dot
-            renderDots( points, current )
+            function yline( startX, startY, endY, opt){
+                var line = s.line(startX,startY, startX, endY)
+                setOpt( line, opt )
+                return line;
+            }   
+
+            function xline( startX, startY, endX, opt){
+                var line = s.line(startX,startY, endX, startY)
+                setOpt( line, opt )
+                return line;
+            }
+
+            function circle( x, y, r, opt){
+                console.log( )
+                var c = s.circle( x,y,r)
+                setOpt( c, opt)
+                return c
+            }
+
+            function makePath( points ){
+                return "M" + points.map( function(point){
+                    return point.toString() + " " +point.toString()
+                }).join(" L")
+            }
+
+            function renderPath( points, current ){
+                var pathStr = makePath(points)
+                var path = s.path( pathStr )
+                var opt = {}
+                if( current ){
+                    opt.stroke = diagramArgs.currentMetricColor
+                }
+
+                setOpt( path, opt)
+                //TODO add dot
+                renderDots( points, current )
+            }
+
+            function renderDots( points, current ){
+                var opt = {fill:diagramArgs.metricColor}
+                if( current ){
+                    opt.stroke = diagramArgs.currentMetricColor
+                }
+                for( var i in points ){
+                    circle( points[i][0], points[i][1],4,opt)
+                }
+            }
+
+
+
+            ///////////////////////////////////////////
+            //TODO
+            //分Metric重新划线
+            ///////////////////////////////////////////
+            event.metricsKeys.forEach(function(metric){
+                var points = [];
+
+                for( var i in diagramArgs.paramsPos ){
+                    // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
+                    //  + " " 
+                    //  + (diagramArgs.paramsPos[i][j]).toString())
+                    points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wUnit/2,
+                        diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
+                }
+                renderPath( points, metric == event.currentMetric )
+
+                // console.log( points)
+
+            })
+            rendered = true
         }
+    })()
 
-        function renderDots( points, current ){
-            var opt = {fill:diagramArgs.metricColor}
-            if( current ){
-                opt.stroke = diagramArgs.currentMetricColor
+    exports.render = (function( vmodel ){
+        var rendered = false
+        return function( vmodel ){
+            if( rendered ){
+                console.log("already rendered")
+                return 
             }
-            for( var i in points ){
-                circle( points[i][0], points[i][1],4,opt)
-            }
+
+            console.log("render diagram...")
+            var diagramArgs = calDiagramArgs( vmodel )
+            renderBg( diagramArgs )
+            renderDom( vmodel, diagramArgs )
+            renderSvg( vmodel, diagramArgs )
+
+            vmodel.$watch('view',function(){
+                console.log( "view changed",arguments)
+                renderDom( vmodel, diagramArgs)
+                renderSvg( vmodel, diagramArgs )
+            })
+            rendered = true
         }
-
-
-
-        ///////////////////////////////////////////
-        //TODO
-        //分Metric重新划线
-        ///////////////////////////////////////////
-        event.metricsKeys.forEach(function(metric){
-            var points = [];
-
-            for( var i in diagramArgs.paramsPos ){
-                // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
-                //  + " " 
-                //  + (diagramArgs.paramsPos[i][j]).toString())
-                points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wUnit/2,
-                    diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
-            }
-            renderPath( points, metric == event.currentMetric )
-
-            // console.log( points)
-
-        })
-    }
-
-    exports.render = function( vmodel ){
-        var diagramArgs = calDiagramArgs( vmodel )
-        renderBg( diagramArgs )
-        renderDom( vmodel, diagramArgs )
-        renderSvg( vmodel, diagramArgs )
-
-        vmodel.$watch('view',function(){
-            console.log( "view changed",arguments)
-            renderDom( vmodel, diagramArgs)
-        })
-    } 
+    })() 
 
     exports.preRender = function(){
         console.log("loading events...")
