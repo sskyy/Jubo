@@ -119,6 +119,20 @@
 
         <div id="newParam" ms-class="show:viewMode=='newParam'" ms-controller="createParam">
             <div id="newParamForm">
+                <div id="newMetricForm">
+                    <div ms-with="newMetrics" id="newMetrics">
+                        <div class="row">
+                            <span class="metricInput">{{$key}}</span>
+                            <span class="metricInput">{{$val}}</span>
+                            <a class="btn" ms-click="deleteMetric($key)">-</a>
+                        </div>
+                    </div>
+                    <div>
+                        <input type="text" class="metricInput" ms-duplex="_newMetric.name" placeholder="指标">
+                        <input type="text" class="metricInput" ms-duplex="_newMetric.num" placeholder="值" ms-keypress="keypressMetric">
+                        <a class="btn" ms-click="addMetric">+</a>
+                    </div>
+                </div>
                 <input type="text" id="newParamTitle" placeholder="标题" ms-duplex="newTitle">
                 <div id="newParamAlbum">创建相册</div>
                 <div id="newParamMenu"></div>

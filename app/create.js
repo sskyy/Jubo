@@ -3,7 +3,7 @@ define(['./util'], function(util) {
         paramContentSelector="#newParamContent",
         paramMenuSelector = "#newParamMenu",
         previewSelector = "#newParamPreview",
-        createEventAddr = "http://127.0.0.1:8080/drupal/api/node.json"
+        createNodeAddr = "http://127.0.0.1:8080/drupal/api/node.json"
 
 
     exports.newParamVm = (function(){
@@ -21,10 +21,62 @@ define(['./util'], function(util) {
                 createVm = avalon.define("createParam",function(vm){
                     // vm.name="aaaa"
                     vm.newTitle = ""
-                    vm.publish = function(){
-                        alert( vm.newTitle)
-                        $(previewSelector).html( editor.innerHTML )
+                    vm._newMetric = {
+                        name : "",
+                        num : null
                     }
+                    vm.newMetrics = {}
+                    vm._metricKeys = []
+                    vm.publish = function(){
+                        $(previewSelector).html( editor.innerHTML )
+                        util.api({
+                            url : createNodeAddr,
+                            type:"POST",
+                            data:{
+                                type: "param",
+                                title : vm.newTitle,
+                                body : {
+                                    und : [{
+                                        value : editor.innerHTML,
+                                        format:"full_html"
+                                    }]
+                                },
+                                field_metric:{
+                                    und:_.map(vm.newMetrics.$model,function(metricNum,metricName){
+                                        return {value:metricName+":"+metricNum}
+                                    })
+                                }
+                            }
+                        }).done(function(res){
+                            console.log("DEB: param add success",res)
+                        })
+                    }
+                    vm.keypressMetric = function( $e ){
+                        if( e.which ==13){
+                            vm.addMetric()
+                        }
+                    }
+                    vm.addMetric = function(){
+                        if( vm._newMetric.name !== "" 
+                            && vm._newMetric.num !== null 
+                            && vm.newMetrics[vm._newMetric.name] === undefined
+                            ){
+                            var placeholder = {}
+                            placeholder[vm._newMetric.name] = vm._newMetric.num
+                            vm.newMetrics = _.extend({},vm.newMetrics.$model,placeholder)
+                            console.log('DEB: add metric', vm._newMetric.name,vm._newMetric.num,vm.newMetrics)
+                        }else{
+                            console.log(vm._newMetric.name !== "" ,vm._newMetric.num !== null ,vm.newMetrics[vm._newMetric.name] === undefined)
+                        }
+                        vm._newMetric.name = ""
+                        vm._newMetric.num = null
+                    }
+                    vm.deleteMetric = function( metricName ){
+                        if( vm.newMetrics[metricName] !== undefined){
+                            vm.newMetrics = _.omit(vm.newMetrics.$model, metricName)
+                        }
+                    }
+
                 })   
             }
 
@@ -44,7 +96,7 @@ define(['./util'], function(util) {
                         if( vm.connecting) return 
                         vm.connecting = true
                         util.api({
-                            url:createEventAddr,
+                            url:createNodeAddr,
                             type:"POST",
                             data:{
                                 type:"event",

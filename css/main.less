@@ -78,7 +78,14 @@ a {
     }
 }
 
-.inputTypical{
+.hide{
+    display: none;
+}
+.show{
+    display: block;
+}
+
+input[type="text"]{
     border-width:0;
     border-bottom:1px #ccc solid;
     font-size: 14px;
@@ -604,9 +611,29 @@ a.param{
         position: relative;
         #newMetricForm{
             position: absolute;
-            left: -200px;
+            left: -250px;
             top:100px;
             width: 200px;
+            .metricInput{
+                display: inline-block;
+                width: 70px;
+                line-height: 24px;
+                font-size: 14px;
+            }
+            #newMetrics{
+                .row{
+                    margin-bottom: 4px;
+                    .btn{
+                        visibility: hidden;
+                    }
+                    &:hover{
+                        .btn{
+                            visibility: visible;
+                        }
+                    }
+                }
+
+            }
         }
         #newParamTitle{
             border-width:0;
