@@ -12,19 +12,24 @@ define([], function(  ) {
             lines : 6,
             hContainer : 550,
             hContainerbottom:10,
+            diagramSelector : '#diagram',
             paramSelector : '.param',
+            paramsSelector : "#params",
             bgSelector : '#diagramBg',
             svgSelector : '#metricLines',
+            svgContainerSelector : '#metricLinesContainer',
             paramLineOffset : 50,
             currentMetricColor : "#9AC600",
             metricColor : "#ddd"
         } 
-
-        args.containerGrid = parseInt(document.body.clientWidth/args.wUnit)
+        args.wContainer = document.querySelector( args.diagramSelector).clientWidth
+        args.containerGrid = parseInt( args.wContainer /args.wUnit)
         args.cols = args.params.length > args.containerGrid ? args.params.length + 1 : args.containerGrid
-        args.colOffset = args.wUnit/2
+        args.wParams = args.params.length*args.wUnit
+        args.colOffset = ((args.wContainer- args.wParams)/2 + args.wUnit/2)%args.wUnit
         args.containerLines = parseInt((document.body.clientHeight-200)/args.hUnit)
         args.lineOffset = args.hUnit/2
+
 
         return args
 
@@ -32,7 +37,12 @@ define([], function(  ) {
 
     //render BG
     var renderBg = function( diagramArgs ){
-        var ctx = document.querySelector( diagramArgs.bgSelector ).getContext("2d");
+        var canvas = document.querySelector( diagramArgs.bgSelector ),
+            ctx = canvas.getContext("2d"),
+            canvasWidth = _.max([diagramArgs.wParams ,diagramArgs.wContainer])
+
+            canvas.width = canvasWidth
+            
         var defaultOpt = {
             lineWidth: 1,
             strokeStyle: 'rgb(255,255,255)',
@@ -86,17 +96,17 @@ define([], function(  ) {
                 yline(i * colWidth + colOffset, (lines-1) * lineHeight + lineOffset, 0)
             }
             for (var j = 0; j < lines; j++) {
-                xline(0, j * lineHeight + lineOffset, colWidth * cols)
+                xline(0, j * lineHeight + lineOffset, canvasWidth)
             }
         }
 
         
-        yline( 0, 0, diagramArgs.hUnit * (diagramArgs.lines-1) + diagramArgs.hUnit/2)
+        // yline( 0, 0, diagramArgs.hUnit * (diagramArgs.lines-1) + diagramArgs.hUnit/2)
         renderMatrix( diagramArgs.wUnit, 
             diagramArgs.hUnit, 
             diagramArgs.cols, 
             diagramArgs.lines, 
-            diagramArgs.wUnit/2, 
+            diagramArgs.colOffset, 
             diagramArgs.hUnit/2 )
     }
 
@@ -110,6 +120,7 @@ define([], function(  ) {
             isShortcutModel = (event.view!="overview") ? true:false,
             positionKey = isShortcutModel ? 'position' : 'shortcut-position'
 
+        $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
             // console.log("isShortcutModel"  ,isShortcutModel)
         if( params.length!=0 && !$(params[0]).data(positionKey)){
             diagramArgs.paramsPos = []
@@ -128,7 +139,7 @@ define([], function(  ) {
                             position = $(param).data(positionKey) || {}
 
                         position[metric] = {
-                            left : i*diagramArgs.wUnit+10,
+                            left : i*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wParam)/2,
                             top : (metricTop - paramMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                         }
                         
@@ -141,9 +152,8 @@ define([], function(  ) {
                     })
                 }
             }else{
+                var stack = 0    
                 _.each(params, (function( param, i ){
-                    console.log( "param outerHeight",$(params[i]).outerHeight() +10)
-                    var stack = 0
                     return function( param, i){
                         $(param).data(positionKey, {
                             left:0,
@@ -173,6 +183,8 @@ define([], function(  ) {
             if( rendered || event.view != 'overview'){
                 return
             }
+            $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
+
             var s = Snap( diagramArgs.svgSelector)
 
             var setOpt = function(ele, opt){
@@ -234,11 +246,6 @@ define([], function(  ) {
             }
 
 
-
-            ///////////////////////////////////////////
-            //TODO
-            //分Metric重新划线
-            ///////////////////////////////////////////
             event.metricsKeys.forEach(function(metric){
                 var points = [];
 
@@ -246,7 +253,7 @@ define([], function(  ) {
                     // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
                     //  + " " 
                     //  + (diagramArgs.paramsPos[i][j]).toString())
-                    points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wUnit/2,
+                    points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wParam/2,
                         diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
                 }
                 renderPath( points, metric == event.currentMetric )

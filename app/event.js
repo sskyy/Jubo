@@ -1,5 +1,7 @@
-define(['./diagram'], function(Diagram) {
-    var exports = {};
+define(['./diagram','./param','./util'], function(Diagram,Param,util) {
+    var exports = {},
+        detailParam = Param.vmodel(),
+        eventAddr = "http://127.0.0.1:8080/drupal/api/node/"
 
     function standardParams( params ){
         var oneDay = 24*60*60*1000
@@ -12,6 +14,18 @@ define(['./diagram'], function(Diagram) {
             params[i].isActive = false
         }
         return params
+    }
+
+    function standardEvent( res){
+        var result = {
+            title : res.title,
+            intro : res.body.und[0].value,
+            id : res.nid,
+            args :{},
+            metrics : [],
+            params : []
+        }
+        return result
     }
     
     exports.vmodel = (function(){
@@ -31,15 +45,17 @@ define(['./diagram'], function(Diagram) {
                     vm.$skipArray = ["metrics"]
                     vm.active = function(param){
                         vm.currentParam = param
-                        console.log("active param", param)
                     }
                     vm.unactive = function(){
                         vm.currentParam= null
                     }
                     vm.loadEvent = function( id, refresh ){
                         if( refresh || !vm.id || id != vm.id ){
-                            console.log("ajax get event data", refresh, vm.id, id!= vm.id)
-                            $.getJSON("/data/event.json").done( function(res){
+                            // console.log("ajax get event data", refresh, vm.id, id!= vm.id)
+                            util.api({
+                                url:eventAddr+id+".json",
+                            }).done( function(res){
+                                res = standardEvent(res)
                                 vm.set( res ) 
                             })    
                         }
@@ -65,11 +81,9 @@ define(['./diagram'], function(Diagram) {
                             vm.view = view                    
                         }
                     }
-
                     vm.setMetric = function(){
                         vm.currentMetric = _.keys(vm.metrics)[0]
                     }
-
                     vm.set = function( event ){
                         vm.currentMetric = event.args.defaultMetric
                         vm.metricsKeys = _.keys( event.metrics)

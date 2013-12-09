@@ -4,6 +4,7 @@
 	<meta charset="utf8">
     <script src="./lib/snap.svg-min.js"></script>
     <script src="./lib/jquery-1.10.2.min.js"></script>
+    <script src="./lib/jquery.cookie.js"></script>
     <script src="./lib/underscore-min.js"></script>
     <script src="./lib/head.core.min.js"></script>
     <script src="./lib/moment-with-langs.js"></script>
@@ -15,89 +16,106 @@
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
 </head>
 <body ms-controller="general">
+    <div id="login" class="modal"  ms-controller="login" ms-if="viewMode=='login'&&user.uid==0">
+        <a class="close" ms-click="changeView('all')">X</a>
+        <div class="header">登录/注册</div>
+        <div class="message" ms-class="show:message">{{message}}</div>
+        <div class="row"><span class="inputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="inputUsername"></div>
+        <div class="row"><span class="inputLabel">密码</span><input class="inputTypical"  ms-duplex="inputPassword" type="password" ms-keypress="keypress($event)"></div>
+        <div class="footer row"><a class="btn" ms-click="login">登录</a></div>
+    </div>
     <div class="left">
-        <div class="info"></div>
+        <div class="info">
+            <a ms-if="!user.uid" ms-click="changeView('login')">登录</a>
+            <span ms-if="user.uid" class="username">{{user.name}}</span>
+            <a ms-if="user.uid" ms-click="logout">退出</a>
+
+        </div>
         <div class="navs">
-            <a class="viewMode" href="/event/1">时光旅行</a>
+            <a class="viewMode" href="/event/list">时光旅行</a>
             <a class="viewMode" href="/create/event">创建事件</a>
             <a class="viewMode" href="/create/param">创建片段</a>
         </div>
     </div>
 
     <div class="right" ms-controller="event">
-        <div id="detailParam" ms-attr-class="(view=='detailParam'&&'detailParam')" ms-controller="detailParam">
-            <div id="paramBody">
-                <div id="paramAuthor">
-                    <a href="/users/s27zLn" class="author name">
-                      <div class="avatar">
-                        <img alt="0" src="http://tp3.sinaimg.cn/1221788390/180/1289279591/0">
-                      </div>
-                      <br>
-                        {{author.name}}
-                    </a>      
-                    <div class="about">
-                      <p class="intro">{{author.signature}}</p>
+
+        <div id="event" ms-class="show:viewMode=='event'">
+            <div id="detailParam" ms-attr-class="(view=='detailParam'&&'detailParam')" ms-controller="detailParam">
+                <div id="paramBody">
+                    <div id="paramAuthor">
+                        <a href="/users/s27zLn" class="author name">
+                          <div class="avatar">
+                            <img alt="0" src="http://tp3.sinaimg.cn/1221788390/180/1289279591/0">
+                          </div>
+                          <br>
+                            {{author.name}}
+                        </a>      
+                        <div class="about">
+                          <p class="intro">{{author.signature}}</p>
+                        </div>
+                        <div class="sns">
+                          <a href="http://site.douban.com/cctvjz/"><i class="icon-home"></i></a><a href="http://weibo.com/u/1221788390" target="_blank"><img alt="Weibo_48" src="http://assets2.jianshu.io/assets/weibo_48-ecf8fc75c0b7211b0ecad85ce23eb1fe.png"></a><a href="http://www.douban.com/people/23446096" target="_blank"><img alt="Douban_48" src="http://assets3.jianshu.io/assets/douban_48-be5d39195c94e54ddf7077ed2fa27901.png"></a>
+                        </div>
                     </div>
-                    <div class="sns">
-                      <a href="http://site.douban.com/cctvjz/"><i class="icon-home"></i></a><a href="http://weibo.com/u/1221788390" target="_blank"><img alt="Weibo_48" src="http://assets2.jianshu.io/assets/weibo_48-ecf8fc75c0b7211b0ecad85ce23eb1fe.png"></a><a href="http://www.douban.com/people/23446096" target="_blank"><img alt="Douban_48" src="http://assets3.jianshu.io/assets/douban_48-be5d39195c94e54ddf7077ed2fa27901.png"></a>
+                    <div class="paramTitle">{{title}}</div>
+                    <div id="paramPics" ms-if="view=='detailParam'">
+                      <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
+                        <li>
+                          <img ms-src="pic.addr" alt="">
+                          <p class="caption">{{pic.des}}</p>
+                        </li>
+                      </ul>
+                      <div class="picNav">
+                        <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
+                        </div>
                     </div>
+                    <div id="detailParamContent">{{content}}</div>
                 </div>
-                <div class="paramTitle">{{title}}</div>
-                <div id="paramPics" ms-if="view=='detailParam'">
-                  <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
-                    <li>
-                      <img ms-src="pic.addr" alt="">
-                      <p class="caption">{{pic.des}}</p>
-                    </li>
-                  </ul>
-                  <div class="picNav">
-                    <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
-                    </div>
-                </div>
-                <div id="detailParamContent">{{content}}</div>
             </div>
-        </div>
 
-        <div id="overview" ms-attr-class="(view=='detailParam'&&'shortcut')">
-        	<div id="brief"  >
-        		<div id="title"><a ms-attr-href="'/event/'+id">{{title}}</a></div>
-        		<div id="intro">{{intro}}</div>
-        	</div>
-
-        	<div id="diagram" ms-if="title">
-        		<canvas id="diagramBg" width="1600" height="800"></canvas>
-        		<svg id="metricLines">
-     
-                </svg>
-
-                <svg id="brackets" class="brackets" ms-if="currentParam">
-                    <path ms-if="currentParam.index!=0" ms-attr-d="'M'+((currentParam.index)*200-100)+' 550 Q'+((currentParam.index)*200-100)+' 560 '+((currentParam.index)*200-50)+' 560 T'+((currentParam.index)*200)+' 570 Q'+((currentParam.index)*200)+' 560 '+((currentParam.index)*200+50)+' 560 T'+((currentParam.index)*200+100)+' 550'" fill="none" stroke="#cccccc" ></path>
-                    <path ms-if="!(currentParam.index==params.length-1)" ms-attr-d="'M'+((currentParam.index)*200+100)+' 550 Q'+((currentParam.index)*200+100)+' 560 '+((currentParam.index)*200+150)+' 560 T'+((currentParam.index)*200+200)+' 570 Q'+((currentParam.index)*200+200)+' 560 '+((currentParam.index)*200+250)+' 560 T'+((currentParam.index)*200+300)+' 550'" fill="none" stroke="#cccccc" ></path>              
-                    
-<!--                     <line ms-if="currentParam.param&&currentParam.index!=0" ms-attr-x1="(currentParam.index+1)*200-300" ms-attr-x2="(currentParam.index+1)*200-300" 
-                        ms-attr-y1="(1-(params[currentParam.index-1].metric[currentMetric]-metricBottom)/(metricTop-metricBottom))*domBottom" y2="550" stroke="#dddddd" style="stroke-width: 2px;"></line>
-                    <line ms-attr-x1="(currentParam.index+1)*200-100" ms-attr-x2="(currentParam.index+1)*200-100" 
-                        ms-attr-y1="(1-(currentParam.param.metric[currentMetric]-metricBottom)/(metricTop-metricBottom))*domBottom" y2="550" stroke="#dddddd" style="stroke-width: 2px;"></line>
-                    <line ms-if="currentParam.param&&!(currentParam.index==params.length-1)" ms-attr-x1="(currentParam.index+1)*200+100" ms-attr-x2="(currentParam.index+1)*200+100" 
-                        ms-attr-y1="(1-(params[currentParam.index+1].metric[currentMetric]-metricBottom)/(metricTop-metricBottom))*domBottom" y2="550" stroke="#dddddd" style="stroke-width: 2px;"></line> -->
-                </svg>
-
-        		<div id="dates" ms-each-param="params">
-                    <div class="time" ms-attr-style="'left:'+($index*200+50)+'px;'">{{param.timeText}}</div>
-        		    <div class="time fromLast" ms-attr-style="'left:'+($index*200-50)+'px;'" ms-if='param.fromLast'>{{param.fromLast}}</div>
-        		</div>
-
-
-                <div id="params" ms-each-param="params" data-each-rendered="paramRendered">
-                    <a ms-attr-id="'param'+($index+1)" ms-data-param="param" class="param" ms-mouseenter="active(param)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/param/'+param.id">
-                        <div class="cover" ms-class="show:param.cover" ><img ms-src="param.cover"/></div>
-                        <div class="title">{{param.title}}</div>
-                        <div class="text">{{param.content}}</div>
-                        <div class="more">!</div>
-                    </a>
+            <div id="overview" ms-class="show:viewMode=='event'" ms-attr-class="(view=='detailParam'&&'shortcut')">
+                <div id="brief"  >
+                    <a id="title" class"eventTitle" ms-href="/event/{{id}}">{{title}}</a>
+                    <div id="intro">{{intro}}</div>
                 </div>
-        	</div>
+                <div id="diagramContainer">
+                    <div id="diagram" ms-if="title">
+
+                        <canvas id="diagramBg" height="620"></canvas>                    
+
+                        <div id="metricLinesContainer">
+                            <svg id="metricLines"></svg>
+                        </div>
+                        
+                        <svg id="brackets" class="brackets" ms-if="currentParam">
+                            <path ms-if="currentParam.index!=0" ms-attr-d="'M'+((currentParam.index)*200-100)+' 550 Q'+((currentParam.index)*200-100)+' 560 '+((currentParam.index)*200-50)+' 560 T'+((currentParam.index)*200)+' 570 Q'+((currentParam.index)*200)+' 560 '+((currentParam.index)*200+50)+' 560 T'+((currentParam.index)*200+100)+' 550'" fill="none" stroke="#cccccc" ></path>
+                            <path ms-if="!(currentParam.index==params.length-1)" ms-attr-d="'M'+((currentParam.index)*200+100)+' 550 Q'+((currentParam.index)*200+100)+' 560 '+((currentParam.index)*200+150)+' 560 T'+((currentParam.index)*200+200)+' 570 Q'+((currentParam.index)*200+200)+' 560 '+((currentParam.index)*200+250)+' 560 T'+((currentParam.index)*200+300)+' 550'" fill="none" stroke="#cccccc" ></path>              
+                            
+                        </svg>
+
+                        <div id="params">
+                            <div ms-each-param="params"  data-each-rendered="paramRendered">
+                                <a ms-attr-id="'param'+($index+1)" ms-data-param="param" class="param" ms-mouseenter="active(param)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/param/'+param.id">
+                                    <div class="cover" ms-class="show:param.cover" ><img ms-src="param.cover"/></div>
+                                    <div class="title">{{param.title}}</div>
+                                    <div class="text">{{param.content}}</div>
+                                    <div class="more">!</div>
+                                </a>
+                            </div>
+
+                            <div id="dates" ms-each-param="params">
+                                <div class="time" ms-attr-style="'left:'+($index*200+50)+'px;'">{{param.timeText}}</div>
+                                <div class="time fromLast" ms-attr-style="'left:'+($index*200-50)+'px;'" ms-if='param.fromLast'>{{param.fromLast}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        
 
         <div id="newParam" ms-class="show:viewMode=='newParam'" ms-controller="createParam">
             <div id="newParamForm">
@@ -115,6 +133,23 @@
 
         </div>
 
+        <div id="newEvent" ms-class="show:viewMode=='newEvent'" ms-controller="createEvent">
+            <div id="newEventForm">
+                <input type="text" id="newEventTitle" placeholder="标题" ms-duplex="newEventTitle">
+                <textarea id="newEventIntro" ms-duplex="newEventIntro" placeholder="简介"></textarea>
+                <div class="">
+                    <a class="btn" ms-class="disable:connecting" ms-click="publish">{{connecting?"保存中":"发布"}}</a>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="events" ms-class="show:viewMode=='all'" ms-controller="events" ms-each-event="events">
+            <div class="event">
+                <div><a class="eventTitle" ms-href="/event/{{event.nid}}">{{event.title}}</a></div>
+                <div><a class="eventIntro" ms-href="/event/listVm">{{event.body}}</a></div>
+            </div>
+        </div>
     </div>
 
     <script src="./lib/avalon.0981.js"></script>

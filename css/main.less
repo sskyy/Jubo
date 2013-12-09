@@ -28,19 +28,122 @@
     border-bottom-left-radius: 0px;
 }
 
+
 ::selection {     
 background:#9AC600;     
 color:#fff;     
 } 
 
 
+
+a:hover {
+    text-decoration: none;
+}
+a:hover, a:focus {
+    color: #000;
+    text-decoration: underline;
+}
+a:hover, a:active {
+    outline: 0;
+}
+a {
+    -webkit-transition: color 0.35s linear;
+    -moz-transition: color 0.35s linear ;
+    -ms-transition: color 0.35s linear ;
+    -o-transition: color 0.35s linear ;
+    transition: color 0.35s linear ;
+}
+a {
+    color: #555;
+    text-decoration: none;
+}
+
 .btn{
     display: inline-block;
     padding: 6px 12px;
     color: #fff;
     background: #9ac600;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover{
+        text-decoration:none;
+        color:#fff;
+        background: #A8D313;
+    }    
+    &.disable{
+        background: #ccc;
+        &:hover{
+            color:#fff;
+        }
+    }
+}
+
+.inputTypical{
+    border-width:0;
+    border-bottom:1px #ccc solid;
+    font-size: 14px;
+    line-height: 24px;
+    &:focus{
+        outline: none;
+        border-bottom: 1px solid #999;
+    }
+}
+
+.inputLabel{
+    width: 60px;
+    margin-right: 20px;
+    display: inline-block;
+    text-align: right;
+    font-size: 14px;
+}
+
+.modal{
+    position: absolute;
+    z-index: 9999;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    box-shadow: 0 1px 7px rgba(0,0,0,0.25);
+    .header{
+        font-size: 14px;
+        color:#555;
+        padding:20px 14px;
+        background: #f6f6f6;
+        border-bottom: 1px solid #d9d9d9;
+        margin-bottom: 10px;
+    }
+    .message{
+        line-height: 20px;
+        height: 20px;
+        padding: 2px 4px;
+        text-align: center;
+        color:#E54C64;
+        font-size: 12px;
+        &.show{
+            // border:1px #9AC600  solid;
+        }
+    }
+    .footer{
+        text-align: right;
+    }
+    .row{
+        padding: 10px 45px;
+    }
+    .close{
+        position: absolute;
+        right: 12px;
+        top: 20px;
+        font-size: 14px;
+        color: #ccc;
+    }
 }
 //
+
+
+
+
+
+
 
 html,body{
     height: 100%;
@@ -57,7 +160,14 @@ html,body{
     position: absolute;
     top:0;
     left:0;
+    .info{
+        color:#eee;
+        text-align: right;
+        padding: 10px;
+        height: 400px;
+    }
 }
+
 .right{
     position: relative;
     height: 100%;
@@ -68,30 +178,59 @@ html,body{
 
 }
 
+
+#event{
+    display: none;
+    width: 100%;
+    height: 100%;
+    &.show{
+        display: block;
+    }
+}
+
 #brief{
+    width: 620px;
     margin-bottom: 10px;
-    margin: 10px;
+    margin: 10px auto;
     padding: 10px 10px 10px 10px;
     background: #fff;
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    
+    #title{
+        color:#555;
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 30px;
+        cursor: pointer;
+        display: block;
+        font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
+        text-decoration: none;
+        &:hover{
+            color:#333;
+            text-decoration: underline;
+        }
+    }
+
+    #intro{
+        font-size: 14px;
+        color:#878787;
+        line-height: 20px;
+        line-height: 160%;
+    }
 }
-#brief #title{
-    color:#333;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 30px;
-    margin-bottom: 5px;
-    cursor: pointer;
-}
-#brief #intro{
-    font-size: 14px;
-    color:#878787;
-    line-height: 20px;
-    line-height: 160%;
+
+
+#diagramContainer{
+    width: 100%;
+    padding: 0 10px;
+    height: 660px;
+    box-sizing:border-box;
+    overflow-x: auto;
 }
 #diagram{
     position: relative;
-    margin: 10px;
+    margin: 10px 0;
+    width: 100%;
     /*background: #fff;*/
     min-height: 660px;
     /*box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);*/
@@ -99,24 +238,21 @@ html,body{
 #diagramBg{
     position: absolute;
     top:10px;
-    left:10px;
+    left:0px;
 }
 #metricLines{
-    position: absolute;
-    top:10px;
-    left: 10px;
-    width: 1000px;
-    height: 800px;
+    height: 580px;
 }
-#params{
-    position: absolute;
-    top:10px;
-    left: 10px;
-    width: 1000px;
-    height: 0px;
-    overflow: visible;
+#metricLinesContainer{
+    margin: 0 auto;
+    height: 580px;
 }
 
+#params{
+    position: relative;
+    margin: -580px auto 0 auto;
+    height: 580px;
+}
 .param{
     /*visibility: hidden;*/
     display: block;
@@ -187,10 +323,10 @@ a.param{
 }
 
 #dates{
-    position:absolute;
-    top:580px;
-    left:10px;
+    position: absolute;
+    bottom: 0;
     font-size:12px;
+    margin: 0 auto;
 }
 
 #dates .time{
@@ -212,35 +348,54 @@ a.param{
 }
 
 #overview{
-
     position: absolute;
     left: 0;
     top: 0;
     background:#ededef;
     width: 100%;
     height: 100%;
+    &.show{
+        display: block;
+    }
+
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+    -ms-transition: all .5s;
+     -o-transition: all .5s;
+        transition: all .5s;
     &.shortcut{
         width: 205px;
-        overflow-y: scroll;
+        overflow-y: hidden;
         overflow-x: hidden;
         -webkit-transition: all .5s;
         -moz-transition: all .5s;
         -ms-transition: all .5s;
          -o-transition: all .5s;
             transition: all .5s;
-        #diagramBg,#metricLines,#dates,#brackets{
+        #diagramContainer{
+            height: auto;
+            padding-bottom: 100px;
+            overflow-y: visible;
+            overflow-x: hidden;
+
+        }
+        #diagramBg,#metricLinesContainer,#dates,#brackets{
             display: none;
         }
         #diagram{
+            position: relative;
             margin-left: 0;
+            height: auto;
+            width: auto;
             #params{
                 position: relative;
                 height: auto !important;
+                margin-top: 0;
             }
         }
         #brief{
             width: 160px;
-            margin: 10px 0px 0px 10px;
+            margin: 10px 0px 10px 10px;
             #intro{
                 display: none
             }
@@ -259,9 +414,10 @@ a.param{
     overflow-y: scroll;
     box-shadow:-2px 0px 5px #777;
     &.detailParam{
-        z-index: 2;
+        // z-index: 2;
     }
     #paramBody{
+        position: relative;
         width: 620px;
         margin: 0 auto;
 
@@ -281,8 +437,8 @@ a.param{
 
         #paramAuthor{
             position: absolute;
-            top:40px;
-            right: 1100px;
+            top:20px;
+            right: 700px;
             width: 160px;
             text-align: right;
             a{
@@ -443,6 +599,7 @@ a.param{
 
         #newParamTitle{
             border-width:0;
+            border-bottom:1px #fff solid;
             font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
             font-size: 50px;
             font-weight: 700;
@@ -480,11 +637,7 @@ a.param{
     }
 }
 
-.left{
-    .info{
-        height: 400px;
-    }
-}
+
 a.viewMode{
     text-decoration: none;
     color:#999;
@@ -518,4 +671,113 @@ a.viewMode{
     font-weight: 700;
     line-height: 70px;
     margin-bottom: 20px;
+}
+
+#newEvent{
+    display: none;
+    position: absolute;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background: #ededef;
+    &.show{
+        display: block;
+    }
+    #newEventForm{
+        margin: 10px auto 0 auto;
+        padding: 10px;
+        width: 620px;
+        background: #fff;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+        #newEventTitle{
+            display: block;
+            border-width: 0;
+            border-bottom:1px #eee solid;
+            font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
+            font-size: 50px;
+            font-weight: 700;
+            line-height: 70px;
+            margin-bottom: 20px;
+            &:focus{
+                outline: none;
+                border-bottom: 1px solid #999;
+            }
+        }
+        #newEventIntro{
+            border-width: 0;
+            width: 100%;
+            min-height: 600px;
+            font-size: 14px;
+            color: #878787;
+            line-height: 20px;
+            line-height: 160%;
+            &:focus{
+                outline: none;
+            }
+        }
+    }
+}
+
+
+#login{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -120px;
+    margin-left: -200px;
+    width:400px;
+    height: 250px;
+    color:#555;
+    .inputTypical{
+        width: 220px;
+    }
+}
+
+#events{
+    display: none;
+    height: 100%;
+    width: 100%;
+    padding-top: 20px;
+    background: #ededef;
+    position: absolute;
+    top: 0;
+    left: 0;
+    &.show{
+        display: block;
+    }
+    .event{
+        position: relative;
+        margin: 0 auto 30px auto;
+        padding-bottom: 30px;
+        border-bottom: 1px dashed #d9d9d9;
+        width: 640px;
+        overflow: hidden;
+    }
+    a.eventTitle{
+        display: block;
+        margin: 0 auto 15px;
+        padding-right: 162px;
+        display: inherit;
+        font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
+        font-size: 33px;
+        font-weight: bold;
+        line-height: 40px;
+        color:#555;
+        text-decoration: none;
+        &:hover{
+            color: #333;
+        }
+    }
+    a.eventIntro{
+        font-family: Georgia,"Times New Roman",Times,"Songti SC","SimSun",serif;
+        font-size: 16px;
+        font-weight: 100;
+        line-height: 30px;
+        text-decoration: none;
+        color:#777;
+        &:hover{
+            color:#555;
+        }
+    }
 }
