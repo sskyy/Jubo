@@ -166,6 +166,11 @@ html,body{
         padding: 10px;
         height: 400px;
     }
+    .navs{
+        position: absolute;
+        bottom: 20px;
+        right:0px;
+    }
 }
 
 .right{
@@ -596,7 +601,13 @@ a.param{
     #newParamForm{
         width: 620px;
         margin: 10px auto 0 auto;
-
+        position: relative;
+        #newMetricForm{
+            position: absolute;
+            left: -200px;
+            top:100px;
+            width: 200px;
+        }
         #newParamTitle{
             border-width:0;
             border-bottom:1px #fff solid;
@@ -609,8 +620,6 @@ a.param{
                 outline: none;
                 border-bottom: 1px solid #999;
             }
-
-
         }
         #newParamAlbum{
             background: #9AC600;
@@ -628,6 +637,7 @@ a.param{
             line-height: 30px;
             margin-top: 10px;
             padding-bottom: 50px;
+            min-height: 400px;
             font-family: Georgia,"Times New Roman",Times,"Songti SC","SimSun",serif;
             color: #2f2f2f;
         }
