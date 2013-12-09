@@ -64,7 +64,7 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
 
 
         page("*",function(){
-            console.log("don't go, route *")
+            console.log("ERR: SOMETHING WRONG WITH ROUTER!!! * TAKE CHARGE NOW!!!")
         })
 
         page()
