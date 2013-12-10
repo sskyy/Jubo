@@ -8,7 +8,7 @@ define(['./util'], function(util) {
 
     exports.newParamVm = (function(){
         var createVm
-        return function(){
+        return function( general){
             if( !createVm ){
                 //init pen
                 var editor = document.querySelector(paramContentSelector),
@@ -49,6 +49,7 @@ define(['./util'], function(util) {
                             }
                         }).done(function(res){
                             console.log("DEB: param add success",res)
+                            page('/event/'+general.getEventId())
                         })
                     }
                     vm.keypressMetric = function( $e ){

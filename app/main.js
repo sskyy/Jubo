@@ -3,6 +3,7 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
 
     var generalVm = avalon.define('general',function(vm){
         vm.viewMode = "view"
+        vm.modalMode = ""
         vm.user = {
             uid:0,
             name:"",
@@ -23,12 +24,19 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
             mode = mode || 'all'
             vm.viewMode = mode
         }
+        vm.changeModal = function( mode){
+            mode = mode || ""
+            vm.modalMode =  mode
+        }
+        vm.getEventId = function(){
+            return eventVm.id
+        }
     })
 
 
     //需要跟全局通信的数据都放在generalVm里面
-    var eventVm = Event.vmodel(),
-        createVm = Create.newParamVm(),
+    var eventVm = Event.vmodel( generalVm ),
+        createVm = Create.newParamVm(generalVm),
         createEvent = Create.newEventVm(),
         loginVm = Login.vmodel( generalVm ),
         listVm  = List.vmodel()
@@ -36,19 +44,23 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
     exports.run = function(){
         
         avalon.scan()
-
+        //页面元素的显示状态都由全局的viewMode控制。login之类的弹窗由modalMode控制。
+        //页面的改变都由路径控制。
         page("/event/list",function(){
             generalVm.changeView("all")
             listVm.get()
         })
 
         page("/event/:eid",function( ctx, next ){
-            console.log( "route to event", ctx.params.eid)
+            // console.log( "route to event", ctx.params.eid)
             eventVm.showEvent( ctx.params.eid )
             generalVm.changeView("event")
         })
 
         page("/create/param",function(){
+            if( !eventVm.id ){
+                eventVm.loadMyEvents()
+            }
             generalVm.changeView("newParam")
         })
 
@@ -57,8 +69,8 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
         })
 
         page("/event/:eid/param/:pid",function( ctx,next){
-            console.log("route to param", ctx.params.eid, ctx.params.pid)
-            generalVm.changeView("event")
+            // console.log("route to param", ctx.params.eid, ctx.params.pid)
+            generalVm.changeView("param")
             eventVm.showParam( ctx.params.eid, ctx.params.pid )
         })
 

@@ -1,7 +1,8 @@
 define(['./diagram','./param','./util'], function(Diagram,Param,util) {
     var exports = {},
         detailParam = Param.vmodel(),
-        eventAddr = "http://127.0.0.1:8080/drupal/api/node/"
+        eventAddr = "http://127.0.0.1:8080/drupal/api/node/",
+        myEventsAddr = "http://127.0.0.1:8080/drupal/api/my-events.json?display_id=services_1"
 
     function standardParams( params ){
         var oneDay = 24*60*60*1000
@@ -30,7 +31,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
     
     exports.vmodel = (function(){
         var eventVm
-        return function(){
+        return function( general ){
             if( !eventVm){
                 eventVm = avalon.define("event",function(vm){
                     vm.params = []
@@ -41,8 +42,9 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     vm.currentMetric = null
                     vm.currentParam = null
                     vm.id = null
-                    vm.view = "overview"
+                    vm.myEvents = []
                     vm.$skipArray = ["metrics"]
+                    vm.choosing = false
                     vm.active = function(param){
                         vm.currentParam = param
                     }
@@ -51,6 +53,12 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     }
                     vm.loadEvent = function( id, refresh ){
                         if( refresh || !vm.id || id != vm.id ){
+                            vm.choosing = false
+                            //demo
+                            // return $.getJSON("/data/event.json",function(data){
+                            //     console.log("DEB: load event complete, begin set!")
+                            //     vm.set( data ) 
+                            // })
                             // console.log("ajax get event data", refresh, vm.id, id!= vm.id)
                             util.api({
                                 url:eventAddr+id+".json",
@@ -61,7 +69,6 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         }
                     }
                     vm.showEvent = function(id){
-                        (vm.view != "overview") && (vm.view = "overview")
                         Diagram.preRender()
                         vm.loadEvent( id )
                     }
@@ -71,15 +78,9 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         })
                     }
                     vm.showParam = function( eid, pid){
-                        (vm.view != "detailParam") && (vm.view = "detailParam")
                         Diagram.preRender()
                         vm.loadEvent( eid )
                         vm.loadParam( pid )
-                    }
-                    vm.gotoView = function( view, refresh ){
-                        if( refresh || vm.view != view ){
-                            vm.view = view                    
-                        }
                     }
                     vm.setMetric = function(){
                         vm.currentMetric = _.keys(vm.metrics)[0]
@@ -92,11 +93,25 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     }
                     vm.paramRendered = function(a){
                         if( a == "add" && eventVm.params.length!==0){
-                            Diagram.render( eventVm )
+                            console.log("DEB: param dom ready, going to render diagram")
+                            Diagram.render( eventVm, general )
                         }
                     }
                     vm.getEventId = function(){
                         return vm.id
+                    }
+                    vm.switchMode = function( mode ){
+                        vm.choosing = mode || false
+                    }
+                    vm.loadMyEvents = function(){
+                        vm.choosing = true
+                        util.api({
+                            url : myEventsAddr,
+                        }).done(function(data){
+                            vm.myEvents = data
+                        }).fail(function(){
+                            console.log("ERR: load my events failed")
+                        })
                     }
                 })
                 return eventVm

@@ -1,7 +1,7 @@
 define([], function() {
     var exports = {};
     var renderGallary = function( vmodel ){
-        console.log("render gallery")
+        console.log("DEB: rendering gallery")
         $("#slider").responsiveSlides({
             auto: false,
             pager: false,
@@ -33,6 +33,7 @@ define([], function() {
                     }
                     vm.set = function( param){
                         _.extend( detailParam, param)
+                        // console.log( vm.currentPic, vm)
                     }
                     vm.detailParamRendered = function(a){
                         if( a == "add" && detailParam.id){

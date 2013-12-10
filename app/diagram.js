@@ -20,7 +20,8 @@ define([], function(  ) {
             svgContainerSelector : '#metricLinesContainer',
             paramLineOffset : 50,
             currentMetricColor : "#9AC600",
-            metricColor : "#ddd"
+            metricColor : "#ddd",
+            hCanvas : 620
         } 
         args.wContainer = document.querySelector( args.diagramSelector).clientWidth
         args.containerGrid = parseInt( args.wContainer /args.wUnit)
@@ -36,12 +37,15 @@ define([], function(  ) {
     }
 
     //render BG
-    var renderBg = function( diagramArgs ){
+    var renderBg = function( diagramArgs, rendered ){
         var canvas = document.querySelector( diagramArgs.bgSelector ),
             ctx = canvas.getContext("2d"),
             canvasWidth = _.max([diagramArgs.wParams ,diagramArgs.wContainer])
 
+            rendered && ctx.clearRect ( 0 , 0 , canvasWidth , diagramArgs.hCanvas )
+
             canvas.width = canvasWidth
+            canvas.height = diagramArgs.hCanvas
             
         var defaultOpt = {
             lineWidth: 1,
@@ -115,9 +119,9 @@ define([], function(  ) {
     //计算DOM布局，要分metric！！！
     ////////////////////////////////////
 
-    var renderDom = function( event, diagramArgs ){
+    var renderDom = function( event, diagramArgs, viewMode, rendered ){
         var params = document.querySelectorAll(diagramArgs.paramSelector),
-            isShortcutModel = (event.view!="overview") ? true:false,
+            isShortcutModel = (viewMode!="event") ? true:false,
             positionKey = isShortcutModel ? 'position' : 'shortcut-position'
 
         $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
@@ -151,6 +155,7 @@ define([], function(  ) {
                         }
                     })
                 }
+                console.log("DEB: NOT shortcut model", viewMode)
             }else{
                 var stack = 0    
                 _.each(params, (function( param, i ){
@@ -162,6 +167,12 @@ define([], function(  ) {
                         stack += $(params[i]).outerHeight() + 10
                     }
                 })())
+                console.log("DEB: shortcut model")
+
+            }
+        }else{
+            if( params.length !=0 && $(params[0]).data(positionKey)){
+                console.log("DEB: param Dom aready have position", viewMode, positionKey)
             }
         }
 
@@ -179,13 +190,17 @@ define([], function(  ) {
     // must execute after renderDom, cause we need div.param position
     var renderSvg = (function(){
         var rendered = false
-        return function(event, diagramArgs){
-            if( rendered || event.view != 'overview'){
+        return function(event, diagramArgs, viewMode, diagramRendered){
+            if( viewMode != 'event'){
                 return
             }
+
             $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
 
             var s = Snap( diagramArgs.svgSelector)
+            if( rendered ){
+                s.clear()
+            }
 
             var setOpt = function(ele, opt){
                 ele.attr( _.extend({
@@ -267,29 +282,34 @@ define([], function(  ) {
 
     exports.render = (function( vmodel ){
         var rendered = false
-        return function( vmodel ){
+        return function( vmodel, general ){
+            var diagramArgs = calDiagramArgs( vmodel )
+            
+            renderBg( diagramArgs, rendered )
+            renderDom( vmodel, diagramArgs, general.viewMode, rendered )
+            renderSvg( vmodel, diagramArgs, general.viewMode, rendered )
+
             if( rendered ){
-                console.log("already rendered")
-                return 
+                console.log("DEB: diagram render sencond time!")
+            }else{
+                console.log("DEB: rendering diagram for the first time")
+
+                general.$watch('viewMode',function( viewMode ){
+                    console.log( "DEB: view changed, rerendering diagram",arguments)
+                    renderDom( vmodel, diagramArgs, viewMode)
+                    renderSvg( vmodel, diagramArgs, viewMode )
+                })
             }
 
-            console.log("render diagram...")
-            var diagramArgs = calDiagramArgs( vmodel )
-            renderBg( diagramArgs )
-            renderDom( vmodel, diagramArgs )
-            renderSvg( vmodel, diagramArgs )
 
-            vmodel.$watch('view',function(){
-                console.log( "view changed",arguments)
-                renderDom( vmodel, diagramArgs)
-                renderSvg( vmodel, diagramArgs )
-            })
+
+
             rendered = true
         }
     })() 
 
     exports.preRender = function(){
-        console.log("loading events...")
+        console.log("DEB: diagram preRender")
     }
 
 

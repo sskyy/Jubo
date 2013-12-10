@@ -27,7 +27,7 @@ define(['./util'], function(util) {
                             _.extend(general.user , data.user)
                             $.cookie(data.session_name,data.sessid)
                             vm.message=""
-                            general.changeView()
+                            general.changeModal()
                             console.log("SUS: Login success",data.user.name)
                         }).fail(function( res,status, msg ){
                             console.log( "SUS: Login failed")
