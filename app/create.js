@@ -3,7 +3,8 @@ define(['./util'], function(util) {
         paramContentSelector="#newParamContent",
         paramMenuSelector = "#newParamMenu",
         previewSelector = "#newParamPreview",
-        createNodeAddr = "http://127.0.0.1:8080/drupal/api/node.json"
+        createNodeAddr = "http://127.0.0.1:8080/drupal/api/node.json",
+        addRelationAddr = "http://127.0.0.1:8080/drupal/api/relation.json"
 
 
     exports.newParamVm = (function(){
@@ -29,6 +30,10 @@ define(['./util'], function(util) {
                     vm._metricKeys = []
                     vm.publish = function(){
                         $(previewSelector).html( editor.innerHTML )
+                        if( !general.getEventId() ){
+                            alert("请选择你要将此片段插入的事件")
+                            return 
+                        }
                         util.api({
                             url : createNodeAddr,
                             type:"POST",
@@ -38,7 +43,7 @@ define(['./util'], function(util) {
                                 body : {
                                     und : [{
                                         value : editor.innerHTML,
-                                        format:"full_html"
+                                        format:"filtered_html"
                                     }]
                                 },
                                 field_metric:{
@@ -49,7 +54,34 @@ define(['./util'], function(util) {
                             }
                         }).done(function(res){
                             console.log("DEB: param add success",res)
-                            page('/event/'+general.getEventId())
+                            vm.addRelation(res.nid, general.getEventId())
+                        })
+                    }
+                    vm.addRelation = function( pid, eid){
+                        console.log("DEB: adding relation", pid, eid)
+                        return util.api({
+                            url : addRelationAddr,
+                            type : "POST",
+                            data:{
+                                "relation_type": "is_param_of",
+                                "endpoints": {
+                                    "und": [
+                                        {
+                                            "entity_type": "node",
+                                            "entity_id": pid,
+                                            "r_index": "0"
+                                        },
+                                        {
+                                            "entity_type": "node",
+                                            "entity_id": eid,
+                                            "r_index": "1"
+                                        }
+                                    ]
+                                }
+                            }
+                        }).done(function(){
+                            console.log("SUS: add Relation for", pid, eid, "suscess")
+                            page("/event/"+eid)
                         })
                     }
                     vm.keypressMetric = function( $e ){

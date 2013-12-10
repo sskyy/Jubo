@@ -2,19 +2,64 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
     var exports = {},
         detailParam = Param.vmodel(),
         eventAddr = "http://127.0.0.1:8080/drupal/api/node/",
-        myEventsAddr = "http://127.0.0.1:8080/drupal/api/my-events.json?display_id=services_1"
+        myEventsAddr = "http://127.0.0.1:8080/drupal/api/my-events.json?display_id=services_1",
+        paramsAddr = "http://127.0.0.1:8080/drupal/api/views/param_list.json"
 
-    function standardParams( params ){
-        var oneDay = 24*60*60*1000
+    function standardAllFields( params, metrics ){
+        var oneDay = 24*60*60,
+            standardParams = [],
+            metrics = metrics || {}
+
+        //get all metrics and set metric to right data structure
+        if( _.isEmpty(metrics)){
+            for( var i in params ){
+                //set data structure to {name1:value1,name2:value2}
+                params[i].metric = _.object( _.compact(params[i].metric.split(",").map(function(m){
+                    m = m.replace(/(^\s*)|(\s*$)/g, "")
+                    var metricArr = m.indexOf(":")== -1 ? false:m.split(":")
+                    if( metricArr){
+                        if( metrics[metricArr[0]] == undefined){
+                            console.log( "DEB: setting metric", metricArr[0], metricArr)
+                            metrics[metricArr[0]] = {
+                                top : metricArr[1],
+                                bottom : metricArr[1]
+                            }
+                        }else{
+                            if( metricArr[1] > metrics[metricArr[0]].top ){
+                                metrics[metricArr[0]].top = metricArr[1]
+                            }else if(metricArr[1] < metrics[metricArr[0]].bottom){
+                                metrics[metricArr[0]].bottom = metricArr[1]
+                            }
+                        }
+                    }
+                    
+                    return  metricArr
+                })))
+            }
+        }
+        console.log("DEB: get metircs",metrics)
+
         for( var i=0,length=params.length;i<length;i++){
+            var param = _.extend(_.pick(params[i],"title","id","time","content","metric"),{
+                timeText : moment(params[i].time*1000).format('YYYY-MM-DD'),
+                isActive :false,
+            })
+
+            //calculate time from node to node
             if( i > 0 ){
                 params[i].fromLast = Math.ceil((params[i].time-params[i-1].time)/oneDay).toString()+'天'
             }
-            params[i].timeText = moment(params[i].time).format('YYYY-MM-DD')
 
-            params[i].isActive = false
+            for( j in metrics ){
+                if( params[i].metric[j] === undefined){
+                    params[i].metric[j] = metrics[j].bottom
+                }
+            }
+            //deal with params short of metrics
+            standardParams.push(param)
         }
-        return params
+        console.log( "DEB: standard all fields", [standardParams,metrics])
+        return [standardParams,metrics]
     }
 
     function standardEvent( res){
@@ -22,9 +67,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
             title : res.title,
             intro : res.body.und[0].value,
             id : res.nid,
-            args :{},
-            metrics : [],
-            params : []
+            args :{}
         }
         return result
     }
@@ -35,15 +78,13 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
             if( !eventVm){
                 eventVm = avalon.define("event",function(vm){
                     vm.params = []
-                    vm.metrics = {}
-                    vm.metricsKeys = []
+                    vm.metircsKeys = []
                     vm.title = null
                     vm.intro = null
                     vm.currentMetric = null
                     vm.currentParam = null
                     vm.id = null
                     vm.myEvents = []
-                    vm.$skipArray = ["metrics"]
                     vm.choosing = false
                     vm.active = function(param){
                         vm.currentParam = param
@@ -65,6 +106,15 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                             }).done( function(res){
                                 res = standardEvent(res)
                                 vm.set( res ) 
+                                util.api({
+                                    url : paramsAddr + "?event_id="+id
+                                }).done(function(data){
+                                    var standardFields= standardAllFields(data)
+                                    var params = standardFields[0]
+                                    var metrics = standardFields[1]
+                                    vm.setMetrics( metrics )
+                                    vm.params = params
+                                })
                             })    
                         }
                     }
@@ -73,22 +123,29 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         vm.loadEvent( id )
                     }
                     vm.loadParam = function( pid, refresh ){
+                        //demo
                         $.getJSON("/data/detailParam.json").done( function( res ){
                             detailParam.set(res)
                         })
+
                     }
                     vm.showParam = function( eid, pid){
                         Diagram.preRender()
                         vm.loadEvent( eid )
                         vm.loadParam( pid )
                     }
-                    vm.setMetric = function(){
-                        vm.currentMetric = _.keys(vm.metrics)[0]
+                    vm.setMetrics = function( metrics ){
+                        console.log("DEB: set metrics", metrics)
+                        vm.metrics = metrics
+                        vm.metricsKeys = _.keys( metrics)
+                        vm.currentMetric = vm.currentMetric || vm.metricsKeys[0]
                     }
                     vm.set = function( event ){
-                        vm.currentMetric = event.args.defaultMetric
-                        vm.metricsKeys = _.keys( event.metrics)
-                        event.params = standardParams( event.params )
+                        vm.currentMetric = event.args.defaultMetric || null
+                        // vm.metricsKeys = event.metrics.length ? event.metrics[0]
+                        //load params seperatly
+                        // event.params = standardParams( event.params )
+                        console.log(event)
                         _.extend( vm, event )
                     }
                     vm.paramRendered = function(a){

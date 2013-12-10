@@ -125,7 +125,9 @@ define([], function(  ) {
             positionKey = isShortcutModel ? 'position' : 'shortcut-position'
 
         $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
-            // console.log("isShortcutModel"  ,isShortcutModel)
+        
+        // console.log("rendering DOM", params, event.metrics)
+        
         if( params.length!=0 && !$(params[0]).data(positionKey)){
             diagramArgs.paramsPos = []
             if( !isShortcutModel ){
@@ -146,7 +148,7 @@ define([], function(  ) {
                             left : i*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wParam)/2,
                             top : (metricTop - paramMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                         }
-                        
+                        // console.log("setting position for", param, positionKey,position)
                         $(param).data(positionKey, position)
 
                         // paramVm.el = {position:position}
