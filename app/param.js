@@ -41,7 +41,7 @@ define(['./util'], function(util) {
                         // console.log( vm.currentPic, vm)
                     }
                     vm.load = function( id ){
-                        util.api({
+                        return util.api({
                             url:paramAddr + id + '.json'
                         }).done(function(data){
                             console.log("DEB: load param", data)
@@ -63,9 +63,14 @@ define(['./util'], function(util) {
                         //we set metrics here
                         var paramMetric = _.extend({},eventMetrics)
                         _.each(paramMetric,function(metric, key){
-                            metric.val = vm.metricVal[key]
+                            if( vm.metricVal[key] === undefined ){
+                                metric.val =  metric.bottom
+                            }else{
+                                metric.val = vm.metricVal[key]
+                            }
                         })
                         vm.metric = paramMetric
+                        console.log("========seting metirc val", vm.metricVal)
                         console.log("DEB: event metrics",paramMetric)
 
                     }

@@ -14,12 +14,12 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
         if( _.isEmpty(metrics)){
             for( var i in params ){
                 //set data structure to {name1:value1,name2:value2}
-                params[i].metric = _.object( _.compact(params[i].metric.split(",").map(function(m){
+                params[i].metric = params[i].metric ? _.object( _.compact(params[i].metric.split(",").map(function(m){
                     m = m.replace(/(^\s*)|(\s*$)/g, "")
                     var metricArr = m.indexOf(":")== -1 ? false:m.split(":")
                     if( metricArr){
                         if( metrics[metricArr[0]] == undefined){
-                            console.log( "DEB: setting metric", metricArr[0], metricArr)
+                            // console.log( "DEB: setting metric", metricArr[0], metricArr)
                             metrics[metricArr[0]] = {
                                 top : parseFloat(metricArr[1]),
                                 bottom : parseFloat(metricArr[1])
@@ -34,7 +34,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     }
                     
                     return  metricArr
-                })))
+                }))) : {}
             }
         }
         console.log("DEB: get metircs",metrics)
@@ -104,12 +104,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         var defer = $.Deferred()
                         if( refresh || !vm.id || id != vm.id ){
                             vm.choosing = false
-                            //demo
-                            // return $.getJSON("/data/event.json",function(data){
-                            //     console.log("DEB: load event complete, begin set!")
-                            //     vm.set( data ) 
-                            // })
-                            // console.log("ajax get event data", refresh, vm.id, id!= vm.id)
+                            console.log( "DEB: ", refresh? "refresh event" : "load new event" , id)
                             util.api({
                                 url:eventAddr+id+".json",
                             }).done( function(res){
@@ -124,24 +119,28 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                                     vm.setMetrics( metrics )
                                     vm.params = params
                                     defer.resolve(vm)
+                                    console.log("SUS: success to load params for event", id)
                                 }).fail(function(){
                                     console.log("ERR: failed to load params for event", id)
-                                    vm.reject()
+                                    defer.reject()
                                 })
+                            }).fail(function(){
+                                console.log("ERR: failed to load event", id)
+                                defer.reject()
                             })    
                         }else{
                             defer.resolve(vm)
                         }
                         return defer
                     }
-                    vm.showEvent = function(id){
+                    vm.showEvent = function(id, refresh){
                         Diagram.preRender()
-                        vm.loadEvent( id )
+                        vm.loadEvent( id, refresh )
                     }
                     vm.showParam = function( eid, pid){
                         Diagram.preRender()
                         $.when( vm.loadEvent( eid ), detailParam.load( pid ) ).done(function(){
-                            console.log( vm.metrics)
+                            console.log("DEB: ready to show param")
                             detailParam.setEventMetrics(vm.metrics.$model)
                         })
                     }

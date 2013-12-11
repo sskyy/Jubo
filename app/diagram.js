@@ -21,6 +21,7 @@ define([], function(  ) {
             paramLineOffset : 50,
             currentMetricColor : "#9AC600",
             metricColor : "#ddd",
+            metricColors :["#9AC600","#18b6b9","#b7dad3","#d6d2a2","#e8ab79"],
             hCanvas : 620
         } 
         args.wContainer = document.querySelector( args.diagramSelector).clientWidth
@@ -119,14 +120,14 @@ define([], function(  ) {
     //计算DOM布局，要分metric！！！
     ////////////////////////////////////
 
-    var renderDom = function( event, diagramArgs, viewMode, rendered ){
+    var renderDom = function( event, diagramArgs, viewMode ){
         var params = document.querySelectorAll(diagramArgs.paramSelector),
             isShortcutModel = (viewMode!="event") ? true:false,
             positionKey = isShortcutModel ? 'shortcut-position' : 'position'
 
         $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
         
-        console.log("DEB: rendering DOM", params.length, event.metrics, positionKey, viewMode)
+        console.log("DEB: rendering DOM", params.length, positionKey, viewMode)
         
         if( params.length!=0 && !$(params[0]).data(positionKey)){
             diagramArgs.paramsPos = []
@@ -154,7 +155,7 @@ define([], function(  ) {
                         // paramVm.el = {position:position}
                         // console.log("i",i)
                         if( i == length-1 ){
-                            console.log("DEB: setting position for param", positionKey,position)
+                            // console.log("DEB: setting position for param", positionKey,position)
                             diagramArgs.paramsPos.push( position )
                         }
                     })
@@ -193,44 +194,29 @@ define([], function(  ) {
 
     // must execute after renderDom, cause we need div.param position
     var renderSvg = (function(){
-        var rendered = false
+        var rendered = false,
+            svg,
+            paths = {},
+            lastId
+
+
         return function(event, diagramArgs, viewMode, diagramRendered){
+
             if( viewMode != 'event'){
                 return
             }
-
-            $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
-
-            var s = Snap( diagramArgs.svgSelector)
-            if( rendered ){
-                s.clear()
-            }
-
-            var setOpt = function(ele, opt){
+            function setOpt(ele, opt){
                 ele.attr( _.extend({
                     stroke: diagramArgs.metricColor,
                     strokeWidth: 5,
                     r:4,
-                    strokeOpacity : 0.5,
+                    strokeOpacity : 0.1,
                     fill : 'none'
                 },opt))
             }
 
-            function yline( startX, startY, endY, opt){
-                var line = s.line(startX,startY, startX, endY)
-                setOpt( line, opt )
-                return line;
-            }   
-
-            function xline( startX, startY, endX, opt){
-                var line = s.line(startX,startY, endX, startY)
-                setOpt( line, opt )
-                return line;
-            }
-
             function circle( x, y, r, opt){
-                console.log( )
-                var c = s.circle( x,y,r)
+                var c = svg.circle( x,y,r)
                 setOpt( c, opt)
                 return c
             }
@@ -241,46 +227,74 @@ define([], function(  ) {
                 }).join(" L")
             }
 
-            function renderPath( points, current ){
+            function renderPath( points, metric,index ){
                 var pathStr = makePath(points)
-                var path = s.path( pathStr )
-                var opt = {}
-                if( current ){
-                    opt.stroke = diagramArgs.currentMetricColor
+                var path = svg.path( pathStr )
+                var opt = {
+                    stroke : diagramArgs.metricColors[index]
                 }
-
                 setOpt( path, opt)
-                //TODO add dot
-                renderDots( points, current )
+                
+                dots = renderDots( points,metric, diagramArgs.metricColors[index] )
+                paths[metric] = svg.g( path, dots )
             }
 
-            function renderDots( points, current ){
-                var opt = {fill:diagramArgs.metricColor}
-                if( current ){
-                    opt.stroke = diagramArgs.currentMetricColor
-                }
+            function renderDots( points, metric, color ){
+                var opt = {
+                    fill: color,
+                    stroke : color
+                },circles = svg.g()
+                
                 for( var i in points ){
-                    circle( points[i][0], points[i][1],4,opt)
+                    circles.add( circle( points[i][0], points[i][1],4,opt) )
                 }
+                return circles
             }
 
+            function setCurrentPath( metric ){
+                paths[metric].attr({
+                    strokeOpacity : 0.5
+                })
+            }
 
-            _.each( _.keys(event.metrics.$model), function(metric){
-                var points = [];
-
-                for( var i in diagramArgs.paramsPos ){
-                    // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
-                    //  + " " 
-                    //  + (diagramArgs.paramsPos[i][j]).toString())
-                    points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wParam/2,
-                        diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
+            //if we only want to set current path
+            if( arguments.length == 1 ){
+                console.log("DEB: only set current metric for svg")
+                return setCurrentPath( arguments[0] )
+            }else{
+                svg = svg || Snap( diagramArgs.svgSelector)
+            
+                if( rendered ){
+                    console.log("DEB: svg second rendering")
+                    if( lastId == event.id ){
+                        return 
+                    }else{
+                        svg.clear()
+                    }
+                }else{
+                    console.log("DEB: svg first rendering")
+                    $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
                 }
-                console.log("DEB: SVG points", points)
-                renderPath( points, metric == event.currentMetric )
 
+                var index = 0
+                _.each( _.keys(event.metrics.$model), function(metric){
+                    var points = [];
 
-            })
-            rendered = true
+                    for( var i in diagramArgs.paramsPos ){
+                        // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
+                        //  + " " 
+                        //  + (diagramArgs.paramsPos[i][j]).toString())
+                        points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wParam/2,
+                            diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
+                    }
+                    // console.log("DEB: SVG points", points)
+                    renderPath( points, metric, index )
+                    index++
+                })
+                setCurrentPath( event.currentMetric )
+                lastId = event.id
+                rendered = true
+            }
         }
     })()
 
@@ -303,13 +317,11 @@ define([], function(  ) {
                     renderDom( vmodel, diagramArgs, viewMode)
                     renderSvg( vmodel, diagramArgs, viewMode )
                 })
-                vmodel.$watch('currentMetric',function(){
+                vmodel.$watch('currentMetric',function( metricName){
                     renderDom( vmodel, diagramArgs, general.viewMode)
+                    renderSvg( )
                 })
             }
-
-
-
 
             rendered = true
         }

@@ -81,11 +81,11 @@ define(['./util'], function(util) {
                             }
                         }).done(function(){
                             console.log("SUS: add Relation for", pid, eid, "suscess")
-                            page("/event/"+eid)
+                            page("/event/"+eid+"?refresh=true")
                         })
                     }
                     vm.keypressMetric = function( $e ){
-                        if( e.which ==13){
+                        if( $e.which ==13){
                             vm.addMetric()
                         }
                     }

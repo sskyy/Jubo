@@ -41,6 +41,8 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
         loginVm = Login.vmodel( generalVm ),
         listVm  = List.vmodel()
 
+
+
     exports.run = function(){
         
         avalon.scan()
@@ -53,7 +55,8 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
 
         page("/event/:eid",function( ctx, next ){
             // console.log( "route to event", ctx.params.eid)
-            eventVm.showEvent( ctx.params.eid )
+            var qs = parseQueryString(ctx.querystring)
+            eventVm.showEvent( ctx.params.eid, qs.refresh || false )
             generalVm.changeView("event")
         })
 
@@ -64,7 +67,7 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
             generalVm.changeView("newParam")
         })
 
-        page("/create/event",function(){
+        page("/create/event",function(ctx){
             generalVm.changeView("newEvent")
         })
 
@@ -89,5 +92,12 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
 
 
     return exports
+
+    function parseQueryString( qs ){
+        return _.object( qs.split("&").map(function(s){
+            return s.split("=")
+        }))
+    }
+
 
 })

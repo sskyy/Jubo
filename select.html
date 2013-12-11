@@ -70,7 +70,7 @@
                                 </span>
                             </span>
                         </div>
-                        <div id="paramPics">
+                        <div id="paramPics" ms-if="pics.length!=0">
                           <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
                             <li>
                               <img ms-src="pic.addr" alt="">
@@ -127,7 +127,7 @@
                     </div>
                 </div>
 
-                <div id="metrics" ms-if="!choosing" ms-with="metrics">
+                <div id="metrics" ms-if="!choosing&&viewMode=='event'" ms-with="metrics">
                     <div class="metric" ms-class="current:currentMetric==$key" ms-click="setCurrentMetric($key)">{{$key}}</div>
                 </div>
 

@@ -1,3 +1,9 @@
+//variable
+@metricColor1:#9AC600;
+@metricColor2:#18b6b9;
+@metricColor3:#d6d2a2;
+@metricColor4:#b7dad3;
+@metricColor5:#e8ab79;
 
 ::-webkit-scrollbar {
     width: 5px;
@@ -437,17 +443,46 @@ a.param{
             width: 50px;
             color:#777;
             font-size: 12px;
+            padding-top: 4px;
             &.current{
                 color:#fff;
-                background: #9AC600;
                 &:hover{
                     color: #fff;
-                    background: #A8D313;
                 }
             }
             &:hover{
                 color: #555;
                 cursor: pointer;
+            }
+            &:nth-child(1){
+                border-bottom: 4px @metricColor1 solid;
+                &.current{
+                    background: @metricColor1;
+                }
+            }
+            &:nth-child(2){
+                border-bottom: 4px @metricColor2 solid;
+                &.current{
+                    background: @metricColor2;
+                }
+            }            
+            &:nth-child(3){
+                border-bottom: 4px @metricColor3 solid;
+                &.current{
+                    background: @metricColor3;
+                }
+            }            
+            &:nth-child(4){
+                border-bottom: 4px @metricColor4 solid;
+                &.current{
+                    background: @metricColor4;
+                }
+            }            
+            &:nth-child(5){
+                border-bottom: 4px @metricColor5 solid;
+                &.current{
+                    background: @metricColor5;
+                }
             }
         }
     }
@@ -560,6 +595,7 @@ a.param{
             font-weight: 700;
             line-height: 70px;
             margin-bottom: 20px;
+            margin-left: -8px;
         }
         #paramMetrics{
             width: 100%;
@@ -602,27 +638,27 @@ a.param{
             }
             .paramMetric:nth-child(1){
                 .paramMetricValBar{
-                    background: #9AC600;
+                    background: @metricColor1;
                 }
             }
             .paramMetric:nth-child(2){
                 .paramMetricValBar{
-                    background: #18b6b9;
+                    background: @metricColor2;
                 }
             }
             .paramMetric:nth-child(3){
                 .paramMetricValBar{
-                    background: #b7dad3;
+                    background: @metricColor3;
                 }
             }
             .paramMetric:nth-child(4){
                 .paramMetricValBar{
-                    background: #d6d2a2;
+                    background: @metricColor4;
                 }
             }            
             .paramMetric:nth-child(5){
                 .paramMetricValBar{
-                    background: #e8ab79;
+                    background: @metricColor5;
                 }
             }
         }
