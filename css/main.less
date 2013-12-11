@@ -561,6 +561,71 @@ a.param{
             line-height: 70px;
             margin-bottom: 20px;
         }
+        #paramMetrics{
+            width: 100%;
+            text-align: left;
+            .paramMetric{
+                display: inline-block;
+                text-align: left;
+                margin-right: 20px;
+                .paramMetricKey{
+                    color: #555;
+                    font-size: 18px;
+                    line-height: 18px;
+                    width: 40px;
+                    vertical-align: bottom;
+                    display: inline-block;
+                }
+                .paramMetricVal{
+                    width: 70px;
+                    display: inline-block;
+                    .paramMetricValText{
+                        display: block;
+                        width: 100%;
+                        font-size: 12px;
+                        line-height: 13px;
+                        color: #777;
+                        text-align: center;
+                    }
+                    .paramMetricValBarCon{
+                        display: block;
+                        width: 100%;
+                        height: 5px;
+                        text-align: left;
+                        background: #ddd;
+                        .paramMetricValBar{
+                            display: block;
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+            .paramMetric:nth-child(1){
+                .paramMetricValBar{
+                    background: #9AC600;
+                }
+            }
+            .paramMetric:nth-child(2){
+                .paramMetricValBar{
+                    background: #18b6b9;
+                }
+            }
+            .paramMetric:nth-child(3){
+                .paramMetricValBar{
+                    background: #b7dad3;
+                }
+            }
+            .paramMetric:nth-child(4){
+                .paramMetricValBar{
+                    background: #d6d2a2;
+                }
+            }            
+            .paramMetric:nth-child(5){
+                .paramMetricValBar{
+                    background: #e8ab79;
+                }
+            }
+        }
 
         #paramPics{
                 width: 100%;

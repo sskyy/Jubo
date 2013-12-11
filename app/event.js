@@ -21,8 +21,8 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         if( metrics[metricArr[0]] == undefined){
                             console.log( "DEB: setting metric", metricArr[0], metricArr)
                             metrics[metricArr[0]] = {
-                                top : metricArr[1],
-                                bottom : metricArr[1]
+                                top : parseFloat(metricArr[1]),
+                                bottom : parseFloat(metricArr[1])
                             }
                         }else{
                             if( metricArr[1] > metrics[metricArr[0]].top ){
@@ -89,6 +89,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     vm.id = null
                     vm.myEvents = []
                     vm.choosing = false
+                    vm.metrics = {}
                     vm.active = function(param){
                         vm.currentParam = param
                     }
@@ -96,6 +97,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         vm.currentParam= null
                     }
                     vm.loadEvent = function( id, refresh ){
+                        var defer = $.Deferred()
                         if( refresh || !vm.id || id != vm.id ){
                             vm.choosing = false
                             //demo
@@ -117,25 +119,27 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                                     var metrics = standardFields[1]
                                     vm.setMetrics( metrics )
                                     vm.params = params
+                                    defer.resolve(vm)
+                                }).fail(function(){
+                                    console.log("ERR: failed to load params for event", id)
+                                    vm.reject()
                                 })
                             })    
+                        }else{
+                            defer.resolve(vm)
                         }
+                        return defer
                     }
                     vm.showEvent = function(id){
                         Diagram.preRender()
                         vm.loadEvent( id )
                     }
-                    vm.loadParam = function( pid, refresh ){
-                        //demo
-                        $.getJSON("/data/detailParam.json").done( function( res ){
-                            detailParam.set(res)
-                        })
-
-                    }
                     vm.showParam = function( eid, pid){
                         Diagram.preRender()
-                        vm.loadEvent( eid )
-                        vm.loadParam( pid )
+                        $.when( vm.loadEvent( eid ), detailParam.load( pid ) ).done(function(){
+                            console.log( vm.metrics)
+                            detailParam.setEventMetrics(vm.metrics.$model)
+                        })
                     }
                     vm.setMetrics = function( metrics ){
                         console.log("DEB: set metrics", vm.metrics, metrics)

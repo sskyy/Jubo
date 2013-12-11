@@ -60,6 +60,16 @@
                             </div>
                         </div>
                         <div class="paramTitle">{{title}}</div>
+                        <div id="paramMetrics" ms-with="metric">
+                            <span class="paramMetric">
+                                <span class="paramMetricKey">{{$key}}</span><span class="paramMetricVal">
+                                    <span class="paramMetricValText">{{$val.val}}/{{$val.top}}</span>
+                                    <span class="paramMetricValBarCon">
+                                        <span ms-attr-style="'width:'+($val.val*100/$val.top)+'%'" class="paramMetricValBar"></span>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
                         <div id="paramPics">
                           <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
                             <li>
@@ -71,7 +81,7 @@
                             <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
                             </div>
                         </div>
-                        <div id="detailParamContent">{{content}}</div>
+                        <div id="detailParamContent" ms-html="content"></div>
                     </div>
                 </div>
 
