@@ -3,7 +3,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
         detailParam = Param.vmodel(),
         eventAddr = "http://127.0.0.1:8080/drupal/api/node/",
         myEventsAddr = "http://127.0.0.1:8080/drupal/api/my-events.json?display_id=services_1",
-        paramsAddr = "http://127.0.0.1:8080/drupal/api/views/param_list.json"
+        paramsAddr = "http://127.0.0.1:8080/drupal/api/views/param_list.json?display_id=services_1"
 
     function standardAllFields( params, metrics ){
         var oneDay = 24*60*60,
@@ -41,9 +41,11 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
 
         for( var i=0,length=params.length;i<length;i++){
             var param = _.extend(_.pick(params[i],"title","id","time","content","metric"),{
-                timeText : moment(params[i].time*1000).format('YYYY-MM-DD'),
+                time : Date.parse(params[i].time),
+                timeText : moment(params[i].time).format('YYYY-MM-DD'),
                 isActive :false,
             })
+            // console.log("DEB: standard param", param)
 
             //calculate time from node to node
             if( i > 0 ){
@@ -78,6 +80,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
             if( !eventVm){
                 eventVm = avalon.define("event",function(vm){
                     vm.params = []
+                    vm.metrics = {}
                     vm.metircsKeys = []
                     vm.title = null
                     vm.intro = null
@@ -107,7 +110,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                                 res = standardEvent(res)
                                 vm.set( res ) 
                                 util.api({
-                                    url : paramsAddr + "?event_id="+id
+                                    url : paramsAddr + "&event_id="+id
                                 }).done(function(data){
                                     var standardFields= standardAllFields(data)
                                     var params = standardFields[0]
@@ -135,18 +138,19 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         vm.loadParam( pid )
                     }
                     vm.setMetrics = function( metrics ){
-                        console.log("DEB: set metrics", metrics)
+                        console.log("DEB: set metrics", vm.metrics, metrics)
                         vm.metrics = metrics
-                        vm.metricsKeys = _.keys( metrics)
-                        vm.currentMetric = vm.currentMetric || vm.metricsKeys[0]
+                        vm.currentMetric = vm.currentMetric || _.keys(metrics)[0]
                     }
                     vm.set = function( event ){
                         vm.currentMetric = event.args.defaultMetric || null
                         // vm.metricsKeys = event.metrics.length ? event.metrics[0]
                         //load params seperatly
                         // event.params = standardParams( event.params )
-                        console.log(event)
                         _.extend( vm, event )
+                    }
+                    vm.setCurrentMetric = function( metricName){
+                        vm.currentMetric = metricName
                     }
                     vm.paramRendered = function(a){
                         if( a == "add" && eventVm.params.length!==0){

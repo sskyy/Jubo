@@ -429,6 +429,29 @@ a.param{
             }
         }
     }    
+    #metrics{
+        text-align: center;
+        .metric{
+            display: inline-block;
+            text-align: center;
+            width: 50px;
+            color:#777;
+            font-size: 12px;
+            &.current{
+                color:#fff;
+                background: #9AC600;
+                &:hover{
+                    color: #fff;
+                    background: #A8D313;
+                }
+            }
+            &:hover{
+                color: #555;
+                cursor: pointer;
+            }
+        }
+    }
+
 }
 
 #paramContainer{

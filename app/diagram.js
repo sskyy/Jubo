@@ -122,42 +122,44 @@ define([], function(  ) {
     var renderDom = function( event, diagramArgs, viewMode, rendered ){
         var params = document.querySelectorAll(diagramArgs.paramSelector),
             isShortcutModel = (viewMode!="event") ? true:false,
-            positionKey = isShortcutModel ? 'position' : 'shortcut-position'
+            positionKey = isShortcutModel ? 'shortcut-position' : 'position'
 
         $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
         
-        // console.log("rendering DOM", params, event.metrics)
+        console.log("DEB: rendering DOM", params.length, event.metrics, positionKey, viewMode)
         
         if( params.length!=0 && !$(params[0]).data(positionKey)){
             diagramArgs.paramsPos = []
             if( !isShortcutModel ){
-                for( var j=0,length=event.metricsKeys.length;j<length;j++){
-                    var metric = event.metricsKeys[j]
-                        metricTop = _.max(event.params.map(function(param){return param.metric[metric]})),
-                        metricBottom = _.min(event.params.map(function(param){return param.metric[metric]})),
+                var metricsKeys = _.keys(event.metrics.$model)
+                for( var i=0,length=metricsKeys.length;i<length;i++ ){
+                    var metricName = metricsKeys[i],
+                        metricTop = event.metrics[metricName].top,
+                        metricBottom = event.metrics[metricName].bottom,
                         metricRange = metricTop - metricBottom,
-                        // console.log( params )
-                        bottomDomHeight = $(_.min( params, function( param){ return param['data-param'].metric[metric]})).outerHeight()
+                        bottomDomHeight = $(_.min( params, function( param){ return param['data-param'].metric[metricName]})).outerHeight()
                     
-                    _.each(params, function( param, i){
+                    _.each(params, function( param, j){
                         var paramVm = param['data-param'],
-                            paramMetric = paramVm.metric[metric],
+                            paramMetric = paramVm.metric[metricName],
                             position = $(param).data(positionKey) || {}
 
-                        position[metric] = {
-                            left : i*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wParam)/2,
+                        position[metricName] = {
+                            left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wParam)/2,
                             top : (metricTop - paramMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                         }
-                        // console.log("setting position for", param, positionKey,position)
+                        // console.log("DEB: setting position for", positionKey,position)
                         $(param).data(positionKey, position)
 
                         // paramVm.el = {position:position}
-                        if( j == length-1 ){
+                        // console.log("i",i)
+                        if( i == length-1 ){
+                            console.log("DEB: setting position for param", positionKey,position)
                             diagramArgs.paramsPos.push( position )
                         }
                     })
                 }
-                console.log("DEB: NOT shortcut model", viewMode)
+                console.log("DEB: NOT shortcut model", viewMode, diagramArgs.paramsPos)
             }else{
                 var stack = 0    
                 _.each(params, (function( param, i ){
@@ -263,7 +265,7 @@ define([], function(  ) {
             }
 
 
-            event.metricsKeys.forEach(function(metric){
+            _.each( _.keys(event.metrics.$model), function(metric){
                 var points = [];
 
                 for( var i in diagramArgs.paramsPos ){
@@ -273,9 +275,9 @@ define([], function(  ) {
                     points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wParam/2,
                         diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
                 }
+                console.log("DEB: SVG points", points)
                 renderPath( points, metric == event.currentMetric )
 
-                // console.log( points)
 
             })
             rendered = true
@@ -300,6 +302,9 @@ define([], function(  ) {
                     console.log( "DEB: view changed, rerendering diagram",arguments)
                     renderDom( vmodel, diagramArgs, viewMode)
                     renderSvg( vmodel, diagramArgs, viewMode )
+                })
+                vmodel.$watch('currentMetric',function(){
+                    renderDom( vmodel, diagramArgs, general.viewMode)
                 })
             }
 

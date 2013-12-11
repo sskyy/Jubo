@@ -117,9 +117,12 @@
                     </div>
                 </div>
 
+                <div id="metrics" ms-if="!choosing" ms-with="metrics">
+                    <div class="metric" ms-class="current:currentMetric==$key" ms-click="setCurrentMetric($key)">{{$key}}</div>
+                </div>
+
                 <div id="diagramContainer" ms-if="!choosing">
                     <div id="diagram" ms-if="title">
-
                         <canvas id="diagramBg"></canvas>                    
 
                         <div id="metricLinesContainer">
@@ -172,7 +175,7 @@
         </div>
     </div>
 
-    <script src="./lib/avalon.0981.js"></script>
+    <script src="./lib/avalon.js"></script>
     <script>
     avalon.require(['../app/main'],function(app){
         app.run()
