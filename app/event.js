@@ -54,6 +54,10 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
 
             for( j in metrics ){
                 if( params[i].metric[j] === undefined){
+                    //fix bug for any metric only appear in one param
+                    if( metrics[j].bottom== metrics[j].top){
+                        metrics[j].bottom = 0
+                    }
                     params[i].metric[j] = metrics[j].bottom
                 }
             }
