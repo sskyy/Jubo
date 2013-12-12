@@ -318,8 +318,10 @@ define([], function(  ) {
                     renderSvg( vmodel, diagramArgs, viewMode )
                 })
                 vmodel.$watch('currentMetric',function( metricName){
-                    renderDom( vmodel, diagramArgs, general.viewMode)
-                    renderSvg( )
+                    if( !vmodel.loading ){
+                        renderDom( vmodel, diagramArgs, general.viewMode)
+                        renderSvg( )
+                    }
                 })
             }
 

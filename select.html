@@ -39,8 +39,8 @@
     </div>
 
     <div class="right" ms-controller="event">
-
-        <div id="event" ms-class="show:viewMode=='event'||viewMode=='param'||viewMode=='newParam'">
+        <div id="loading">正在载入数据...</div>
+        <div id="event" ms-class="show:!loading&&(viewMode=='event'||viewMode=='param'||viewMode=='newParam')">
             <div id="paramContainer">
                 <div id="detailParam" ms-class="hide:viewMode!='param'" ms-class="hide:viewMode!='param'" ms-controller="detailParam">
                     <div id="paramBody">

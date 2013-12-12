@@ -94,6 +94,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     vm.myEvents = []
                     vm.choosing = false
                     vm.metrics = {}
+                    vm.loading = false
                     vm.active = function(param){
                         vm.currentParam = param
                     }
@@ -103,6 +104,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     vm.loadEvent = function( id, refresh ){
                         var defer = $.Deferred()
                         if( refresh || !vm.id || id != vm.id ){
+                            vm.loading = true
                             vm.choosing = false
                             console.log( "DEB: ", refresh? "refresh event" : "load new event" , id)
                             util.api({
@@ -113,6 +115,7 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                                 util.api({
                                     url : paramsAddr + "&event_id="+id
                                 }).done(function(data){
+                                    vm.loading = false
                                     var standardFields= standardAllFields(data)
                                     var params = standardFields[0]
                                     var metrics = standardFields[1]
@@ -121,10 +124,12 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                                     defer.resolve(vm)
                                     console.log("SUS: success to load params for event", id)
                                 }).fail(function(){
+                                    vm.loading = false
                                     console.log("ERR: failed to load params for event", id)
                                     defer.reject()
                                 })
                             }).fail(function(){
+                                vm.loading = false
                                 console.log("ERR: failed to load event", id)
                                 defer.reject()
                             })    
