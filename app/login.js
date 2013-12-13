@@ -1,10 +1,10 @@
 define(['./util'], function(util) {
     var exports = {},
-        baseUrl = "http://127.0.0.1:8080/drupal/"
-        connectAddr = baseUrl + "api/system/connect.json",
-        loginAddr = baseUrl + "api/user/login.json",
-        logoutAddr = baseUrl + "api/user/logout.json",
-        tokenAddr = baseUrl + "api/user/token.json"
+        baseUrl = "http://127.0.0.1:1337/"
+        connectAddr = baseUrl + "user/connect",
+        loginAddr = baseUrl + "user/login",
+        logoutAddr = baseUrl + "user/logout",
+        tokenAddr = baseUrl + "user/token"
 
 
     exports.vmodel = (function(){

@@ -1,6 +1,6 @@
 define([], function() {
     var exports = {},
-        tokenAddr = "http://127.0.0.1:8080/drupal/services/session/token"
+        tokenAddr = "http://127.0.0.1:1337/csrfToken"
 
     exports.api = (function(){
         var token
@@ -10,9 +10,12 @@ define([], function() {
             var defer = $.Deferred()
 
             function wrapOpt( opt ){
-                opt.headers = _.extend({
-                    "X-CSRF-Token":token
-                },opt.headers||{})
+                if( !opt.type || /post/i.test(!opt.type)){
+                    return opt
+                }
+                opt.data = _.extend({
+                    "_csrf":token
+                },opt.data||{})
                 return _.extend(opt,{
                     crossDomain: true,
                     xhrFields: {
@@ -37,7 +40,7 @@ define([], function() {
                     defer.reject(tokenRes)
 
                 }).done(function(tokenRes){
-                    token = tokenRes
+                    token = tokenRes._csrf
                     opt= wrapOpt(opt)
 
                     console.log("AJX:",opt)

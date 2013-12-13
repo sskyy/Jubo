@@ -1,9 +1,10 @@
 define(['./diagram','./param','./util'], function(Diagram,Param,util) {
     var exports = {},
         detailParam = Param.vmodel(),
-        eventAddr = "http://127.0.0.1:8080/drupal/api/node/",
-        myEventsAddr = "http://127.0.0.1:8080/drupal/api/my-events.json?display_id=services_1",
-        paramsAddr = "http://127.0.0.1:8080/drupal/api/views/param_list.json?display_id=services_1"
+        baseUrl = "http://127.0.0.1:1337/",
+        eventAddr = baseUrl+"event",
+        myEventsAddr = baseUrl+"me/event",
+        paramsAddr = baseUrl+"param"
 
     function standardAllFields( params, metrics ){
         var standardParams = [],

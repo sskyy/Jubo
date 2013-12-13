@@ -1,6 +1,6 @@
 define(['./util'], function(util) {
     var exports = {},
-        listAddr = "http://127.0.0.1:8080/drupal/api/events.json?display_id=services_1"
+        listAddr = "http://127.0.0.1:1337/event"
 
     exports.vmodel = (function(){
         var listVm

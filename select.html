@@ -41,10 +41,10 @@
     <div id="Cright" ms-controller="event">
         <div class="Mloading" ms-if="loading">正在载入数据...</div>
         <div id="Mevent" class="Mpage" ms-class="show:!loading&&(viewMode=='event'||viewMode=='param'||viewMode=='newParam')">
-            <div id="CdetailParam">
-                <div id="MdetailParam" ms-class="hide:viewMode!='param'" ms-class="hide:viewMode!='param'" ms-controller="detailParam">
-                    <div id="CparamBody">
-                        <div id="MparamAuthor">
+            <div id="CdetailPiece">
+                <div id="MdetailPiece" ms-class="hide:viewMode!='param'" ms-class="hide:viewMode!='param'" ms-controller="detailParam">
+                    <div id="CpieceBody">
+                        <div id="MpieceAuthor">
                             <a href="/users/s27zLn" class="author name">
                               <div class="avatar">
                                 <img alt="0" src="http://tp3.sinaimg.cn/1221788390/180/1289279591/0">
@@ -59,19 +59,19 @@
                               <a href="http://site.douban.com/cctvjz/"><i class="icon-home"></i></a><a href="http://weibo.com/u/1221788390" target="_blank"><img alt="Weibo_48" src="http://assets2.jianshu.io/assets/weibo_48-ecf8fc75c0b7211b0ecad85ce23eb1fe.png"></a><a href="http://www.douban.com/people/23446096" target="_blank"><img alt="Douban_48" src="http://assets3.jianshu.io/assets/douban_48-be5d39195c94e54ddf7077ed2fa27901.png"></a>
                             </div>
                         </div>
-                        <div class="MparamTitle">{{title}}</div>
-                        <div id="MparamMetrics" ms-with="metric">
-                            <span class="paramMetric">
-                                <span class="paramMetricKey">{{$key}}</span><span class="paramMetricVal">
-                                    <span class="paramMetricValText">{{$val.val}}/{{$val.top}}</span>
-                                    <span class="paramMetricValBarCon">
-                                        <span ms-attr-style="'width:'+($val.val*100/$val.top)+'%'" class="paramMetricValBar"></span>
+                        <div class="MpieceTitle">{{title}}</div>
+                        <div id="MpieceMetrics" ms-with="metric">
+                            <span class="pieceMetric">
+                                <span class="pieceMetricKey">{{$key}}</span><span class="pieceMetricVal">
+                                    <span class="pieceMetricValText">{{$val.val}}/{{$val.top}}</span>
+                                    <span class="pieceMetricValBarCon">
+                                        <span ms-attr-style="'width:'+($val.val*100/$val.top)+'%'" class="pieceMetricValBar"></span>
                                     </span>
                                 </span>
                             </span>
                         </div>
-                        <div id="MparamPics" ms-if="pics.length!=0">
-                          <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
+                        <div id="MpiecePics" ms-if="pics.length!=0">
+                          <ul id="JpiecePicsSlider" class="rslides" ms-each-pic="pics" data-each-rendered="detailPieceRendered">
                             <li>
                               <img ms-src="pic.addr" alt="">
                               <p class="caption">{{pic.des}}</p>
@@ -81,7 +81,7 @@
                             <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
                             </div>
                         </div>
-                        <div id="MparamContent" ms-html="content"></div>
+                        <div id="MpieceContent" ms-html="content"></div>
                     </div>
                 </div>
 
@@ -178,8 +178,8 @@
 
         <div id="events" class="Mpage" ms-class="show:viewMode=='all'" ms-controller="events" ms-each-event="events">
             <div class="event">
-                <div><a class="eventTitle" ms-href="/event/{{event.nid}}">{{event.title}}</a></div>
-                <div><a class="eventIntro" ms-href="/event/listVm">{{event.body}}</a></div>
+                <div><a class="eventTitle" ms-href="/event/{{event.id}}">{{event.title}}</a></div>
+                <div><a class="eventIntro" ms-href="/event/listVm">{{event.content}}</a></div>
             </div>
         </div>
     </div>

@@ -1,9 +1,10 @@
 define(['./util'], function(util) {
     var exports = {},
+        baseUrl = "http://127.0.0.1:1337/",
         paramContentSelector="#newParamContent",
         paramMenuSelector = "#newParamMenu",
         previewSelector = "#newParamPreview",
-        createNodeAddr = "http://127.0.0.1:8080/drupal/api/node.json",
+        createNodeAddr = baseUrl+"event",
         addRelationAddr = "http://127.0.0.1:8080/drupal/api/relation.json"
 
 
@@ -134,15 +135,11 @@ define(['./util'], function(util) {
                             data:{
                                 type:"event",
                                 title:vm.newEventTitle,
-                                body:{
-                                    und:[{
-                                        value:vm.newEventIntro
-                                    }]
-                                }
+                                content:vm.newEventIntro
                             }
                         }).done(function(res){
                             vm.connecting = false
-                            page('/event/'+res.nid)
+                            page('/event/'+res.id)
                             console.log("SUS: create event suscess",res)
                         }).fail(function(res){
                             vm.connecting = false

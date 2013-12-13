@@ -110,6 +110,7 @@ a {
     display: none;
     margin: 0;
     padding: 0;
+    overflow-y: auto;
     &.show{
         display: block;
     }
@@ -534,7 +535,7 @@ a.param{
     height: 100%;
 }
 
-#MdetailParam{
+#MdetailPiece{
     position: absolute;
     left:0;
     top:0;
@@ -546,12 +547,12 @@ a.param{
     overflow-y: scroll;
     box-shadow:-2px 0px 5px #777;
     box-sizing:border-box;
-    #CparamBody{
+    #CpieceBody{
         position: relative;
         width: 620px;
         margin: 0 auto;
 
-        #MparamContent{
+        #MpieceContent{
             width: 100%;
             margin: 0 auto;
             font-size: 18px;
@@ -565,7 +566,7 @@ a.param{
             }
         }
 
-        #MparamAuthor{
+        #MpieceAuthor{
             position: absolute;
             top:20px;
             right: 700px;
@@ -628,7 +629,7 @@ a.param{
             }
         }
 
-        .MparamTitle{
+        .MpieceTitle{
             font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
             font-size: 50px;
             font-weight: 700;
@@ -636,14 +637,14 @@ a.param{
             margin-bottom: 20px;
             margin-left: -8px;
         }
-        #MparamMetrics{
+        #MpieceMetrics{
             width: 100%;
             text-align: left;
-            .paramMetric{
+            .pieceMetric{
                 display: inline-block;
                 text-align: left;
                 margin-right: 20px;
-                .paramMetricKey{
+                .pieceMetricKey{
                     color: #555;
                     font-size: 18px;
                     line-height: 18px;
@@ -651,10 +652,10 @@ a.param{
                     vertical-align: bottom;
                     display: inline-block;
                 }
-                .paramMetricVal{
+                .pieceMetricVal{
                     width: 70px;
                     display: inline-block;
-                    .paramMetricValText{
+                    .pieceMetricValText{
                         display: block;
                         width: 100%;
                         font-size: 12px;
@@ -662,51 +663,51 @@ a.param{
                         color: #777;
                         text-align: center;
                     }
-                    .paramMetricValBarCon{
+                    .pieceMetricValBarCon{
                         display: block;
                         width: 100%;
                         height: 5px;
                         text-align: left;
                         background: #ddd;
-                        .paramMetricValBar{
+                        .pieceMetricValBar{
                             display: block;
                             height: 100%;
                         }
                     }
                 }
             }
-            .paramMetric:nth-child(1){
-                .paramMetricValBar{
+            .pieceMetric:nth-child(1){
+                .pieceMetricValBar{
                     background: @metricColor1;
                 }
             }
-            .paramMetric:nth-child(2){
-                .paramMetricValBar{
+            .pieceMetric:nth-child(2){
+                .pieceMetricValBar{
                     background: @metricColor2;
                 }
             }
-            .paramMetric:nth-child(3){
-                .paramMetricValBar{
+            .pieceMetric:nth-child(3){
+                .pieceMetricValBar{
                     background: @metricColor3;
                 }
             }
-            .paramMetric:nth-child(4){
-                .paramMetricValBar{
+            .pieceMetric:nth-child(4){
+                .pieceMetricValBar{
                     background: @metricColor4;
                 }
             }            
-            .paramMetric:nth-child(5){
-                .paramMetricValBar{
+            .pieceMetric:nth-child(5){
+                .pieceMetricValBar{
                     background: @metricColor5;
                 }
             }
         }
 
-        #MparamPics{
+        #MpiecePics{
                 width: 100%;
                 height: 350px;
                 position: relative;
-                #slider{
+                #JpiecePicsSlider{
                     width : 100%;
                     height: 100%;
                     li{
