@@ -1,4 +1,6 @@
 define(['./event','./create','./login','./list'], function( Event, Create,Login,List ) {
+    moment.lang('zh-cn')
+
     var exports = {}
 
     var generalVm = avalon.define('general',function(vm){

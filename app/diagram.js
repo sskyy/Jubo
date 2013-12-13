@@ -1,14 +1,10 @@
 define([], function(  ) {
     var exports = {};
  
-    function calDiagramArgs( event, calDiagramArgs ){
-
-        var args = {
+    var defaults = {
             wUnit : 200,
             hUnit : 100,
             wParam : 180,
-            params : event.params,
-            metrics : event.metrics,
             lines : 6,
             hContainer : 550,
             hContainerbottom:10,
@@ -22,37 +18,34 @@ define([], function(  ) {
             currentMetricColor : "#9AC600",
             metricColor : "#ddd",
             metricColors :["#9AC600","#18b6b9","#b7dad3","#d6d2a2","#e8ab79"],
-            hCanvas : 620
-        } 
-        args.wContainer = document.querySelector( args.diagramSelector).clientWidth
-        args.containerGrid = parseInt( args.wContainer /args.wUnit)
+            hCanvas : 620}
+
+    defaults.lineOffset = defaults.hUnit/2,
+    defaults.wContainer = document.querySelector( defaults.diagramSelector).clientWidth,
+    defaults.containerLines = parseInt((document.body.clientHeight-200)/defaults.hUnit),
+    defaults.containerGrid = parseInt( defaults.wContainer /defaults.wUnit)
+
+    var calDiagramArgs = function(event){
+        var args = _.extend({},defaults)
+        args.params = event.params,
+        args.metrics = event.metrics,
         args.cols = args.params.length > args.containerGrid ? args.params.length + 1 : args.containerGrid
         args.wParams = args.params.length*args.wUnit
         args.colOffset = ((args.wContainer- args.wParams)/2 + args.wUnit/2)%args.wUnit
-        args.containerLines = parseInt((document.body.clientHeight-200)/args.hUnit)
-        args.lineOffset = args.hUnit/2
-
 
         return args
-
     }
 
     //render BG
-    var renderBg = function( diagramArgs, rendered ){
-        var canvas = document.querySelector( diagramArgs.bgSelector ),
-            ctx = canvas.getContext("2d"),
-            canvasWidth = _.max([diagramArgs.wParams ,diagramArgs.wContainer])
-
-            rendered && ctx.clearRect ( 0 , 0 , canvasWidth , diagramArgs.hCanvas )
-
-            canvas.width = canvasWidth
-            canvas.height = diagramArgs.hCanvas
-            
-        var defaultOpt = {
-            lineWidth: 1,
-            strokeStyle: 'rgb(255,255,255)',
-            fill: '#fff'
-        }
+    var renderBg = (function(){
+        var rendered = false,
+            defaultOpt = {
+                    lineWidth: 1,
+                    strokeStyle: 'rgb(255,255,255)',
+                    fill: '#fff'
+                },
+            canvas = document.querySelector( defaults.bgSelector ),
+            ctx = canvas.getContext("2d")
 
         var fixLineWidth = (function() {
             var translate = false
@@ -67,7 +60,7 @@ define([], function(  ) {
             }
         })()
 
-        var setOpt = function(opt) {
+        function setOpt(opt) {
             opt = opt || _.extend({},defaultOpt, opt)
             if (opt.hasOwnProperty('lineWidth')) {
                 fixLineWidth(opt.lineWidth)
@@ -93,27 +86,33 @@ define([], function(  ) {
             line(startX, startY, startX, endY, opt)
         }
 
+        return function( args ){
+            var canvasWidth = _.max([args.wParams ,args.wContainer])
 
-        function renderMatrix(colWidth, lineHeight, cols, lines, colOffset, lineOffset) {
-            colOffset = colOffset || 0
-            lineOffset = lineOffset || 0
-            for (var i = 0; i < cols; i++) {
-                yline(i * colWidth + colOffset, (lines-1) * lineHeight + lineOffset, 0)
-            }
-            for (var j = 0; j < lines; j++) {
-                xline(0, j * lineHeight + lineOffset, canvasWidth)
+            rendered && ctx.clearRect ( 0 , 0 , canvasWidth , args.hCanvas )
+
+            canvas.width = canvasWidth
+            canvas.height = args.hCanvas
+            
+            renderMatrix( args.wUnit, 
+                args.hUnit, 
+                args.cols, 
+                args.lines, 
+                args.colOffset, 
+                args.hUnit/2 )
+
+            function renderMatrix(colWidth, lineHeight, cols, lines, colOffset, lineOffset) {
+                colOffset = colOffset || 0
+                lineOffset = lineOffset || 0
+                for (var i = 0; i < cols; i++) {
+                    yline(i * colWidth + colOffset, (lines-1) * lineHeight + lineOffset, 0)
+                }
+                for (var j = 0; j < lines; j++) {
+                    xline(0, j * lineHeight + lineOffset, canvasWidth)
+                }
             }
         }
-
-        
-        // yline( 0, 0, diagramArgs.hUnit * (diagramArgs.lines-1) + diagramArgs.hUnit/2)
-        renderMatrix( diagramArgs.wUnit, 
-            diagramArgs.hUnit, 
-            diagramArgs.cols, 
-            diagramArgs.lines, 
-            diagramArgs.colOffset, 
-            diagramArgs.hUnit/2 )
-    }
+    })()
 
     ////////////////////////////////////
     //TODO
@@ -127,7 +126,7 @@ define([], function(  ) {
 
         $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
         
-        console.log("DEB: rendering DOM", params.length, positionKey, viewMode)
+        console.log("DEB: rendering DOM", params.length,diagramArgs.wParams, positionKey)
         
         if( params.length!=0 && !$(params[0]).data(positionKey)){
             diagramArgs.paramsPos = []
@@ -257,8 +256,8 @@ define([], function(  ) {
                 })
             }
 
-            //if we only want to set current path
             if( arguments.length == 1 ){
+                //if we only want to set current path
                 console.log("DEB: only set current metric for svg")
                 return setCurrentPath( arguments[0] )
             }else{
@@ -273,8 +272,8 @@ define([], function(  ) {
                     }
                 }else{
                     console.log("DEB: svg first rendering")
-                    $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
                 }
+                $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
 
                 var index = 0
                 _.each( _.keys(event.metrics.$model), function(metric){
@@ -303,9 +302,9 @@ define([], function(  ) {
         return function( vmodel, general ){
             var diagramArgs = calDiagramArgs( vmodel )
             
-            renderBg( diagramArgs, rendered )
-            renderDom( vmodel, diagramArgs, general.viewMode, rendered )
-            renderSvg( vmodel, diagramArgs, general.viewMode, rendered )
+            renderBg( diagramArgs )
+            renderDom( vmodel, diagramArgs, general.viewMode )
+            renderSvg( vmodel, diagramArgs, general.viewMode )
 
             if( rendered ){
                 console.log("DEB: diagram render sencond time!")
@@ -313,12 +312,16 @@ define([], function(  ) {
                 console.log("DEB: rendering diagram for the first time")
 
                 general.$watch('viewMode',function( viewMode ){
-                    console.log( "DEB: view changed, rerendering diagram",arguments)
-                    renderDom( vmodel, diagramArgs, viewMode)
-                    renderSvg( vmodel, diagramArgs, viewMode )
+                    if( !vmodel.loading ){
+                        console.log( "DEB: view changed, rerendering diagram",arguments)
+                        diagramArgs = calDiagramArgs( vmodel )
+                        renderDom( vmodel, diagramArgs, viewMode)
+                        renderSvg( vmodel, diagramArgs, viewMode )
+                    }
                 })
                 vmodel.$watch('currentMetric',function( metricName){
                     if( !vmodel.loading ){
+                        diagramArgs = calDiagramArgs( vmodel )
                         renderDom( vmodel, diagramArgs, general.viewMode)
                         renderSvg( )
                     }

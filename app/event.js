@@ -6,10 +6,9 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
         paramsAddr = "http://127.0.0.1:8080/drupal/api/views/param_list.json?display_id=services_1"
 
     function standardAllFields( params, metrics ){
-        var oneDay = 24*60*60,
-            standardParams = [],
+        var standardParams = [],
             metrics = metrics || {}
-
+            systemMetricNames = ['阅读']
         //get all metrics and set metric to right data structure
         if( _.isEmpty(metrics)){
             for( var i in params ){
@@ -18,6 +17,12 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     m = m.replace(/(^\s*)|(\s*$)/g, "")
                     var metricArr = m.indexOf(":")== -1 ? false:m.split(":")
                     if( metricArr){
+                        //hack for param view count
+                        if( _.indexOf(systemMetricNames,metricArr[0]) != -1 ){
+                            metricArr[1] = params[i][metricArr[0]]
+                        }
+                        //hack end
+
                         if( metrics[metricArr[0]] == undefined){
                             // console.log( "DEB: setting metric", metricArr[0], metricArr)
                             metrics[metricArr[0]] = {
@@ -35,6 +40,8 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                     
                     return  metricArr
                 }))) : {}
+
+                
             }
         }
         console.log("DEB: get metircs",metrics)
@@ -45,11 +52,12 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                 timeText : moment(params[i].time).format('YYYY-MM-DD'),
                 isActive :false,
             })
-            // console.log("DEB: standard param", param)
+            //store last timestamp
+            params[i].time = Date.parse(params[i].time)
 
             //calculate time from node to node
             if( i > 0 ){
-                params[i].fromLast = Math.ceil((params[i].time-params[i-1].time)/oneDay).toString()+'天'
+                param.fromLast = moment.duration(params[i].time-params[i-1].time).humanize()
             }
 
             for( j in metrics ){

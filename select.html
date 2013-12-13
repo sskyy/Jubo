@@ -16,15 +16,15 @@
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
 </head>
 <body ms-controller="general">
-    <div id="login" class="modal"  ms-controller="login" ms-if="modalMode=='login'&&user.uid==0">
+    <div id="login" class="Mmodal"  ms-controller="login" ms-if="modalMode=='login'&&user.uid==0">
         <a class="close" ms-click="changeModal">X</a>
         <div class="header">登录/注册</div>
         <div class="message" ms-class="show:message">{{message}}</div>
-        <div class="row"><span class="inputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="inputUsername"></div>
-        <div class="row"><span class="inputLabel">密码</span><input class="inputTypical"  ms-duplex="inputPassword" type="password" ms-keypress="keypress($event)"></div>
-        <div class="footer row"><a class="btn" ms-click="login">登录</a></div>
+        <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="inputUsername"></div>
+        <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="inputPassword" type="password" ms-keypress="keypress($event)"></div>
+        <div class="footer row"><a class="Mbtn" ms-click="login">登录</a></div>
     </div>
-    <div class="left">
+    <div id="Cleft">
         <div class="info">
             <a ms-if="!user.uid" ms-click="changeModal('login')">登录</a>
             <span ms-if="user.uid" class="username">{{user.name}}</span>
@@ -38,13 +38,13 @@
         </div>
     </div>
 
-    <div class="right" ms-controller="event">
-        <div id="loading">正在载入数据...</div>
-        <div id="event" ms-class="show:!loading&&(viewMode=='event'||viewMode=='param'||viewMode=='newParam')">
-            <div id="paramContainer">
-                <div id="detailParam" ms-class="hide:viewMode!='param'" ms-class="hide:viewMode!='param'" ms-controller="detailParam">
-                    <div id="paramBody">
-                        <div id="paramAuthor">
+    <div id="Cright" ms-controller="event">
+        <div class="Mloading" ms-if="loading">正在载入数据...</div>
+        <div id="Mevent" class="Mpage" ms-class="show:!loading&&(viewMode=='event'||viewMode=='param'||viewMode=='newParam')">
+            <div id="CdetailParam">
+                <div id="MdetailParam" ms-class="hide:viewMode!='param'" ms-class="hide:viewMode!='param'" ms-controller="detailParam">
+                    <div id="CparamBody">
+                        <div id="MparamAuthor">
                             <a href="/users/s27zLn" class="author name">
                               <div class="avatar">
                                 <img alt="0" src="http://tp3.sinaimg.cn/1221788390/180/1289279591/0">
@@ -59,8 +59,8 @@
                               <a href="http://site.douban.com/cctvjz/"><i class="icon-home"></i></a><a href="http://weibo.com/u/1221788390" target="_blank"><img alt="Weibo_48" src="http://assets2.jianshu.io/assets/weibo_48-ecf8fc75c0b7211b0ecad85ce23eb1fe.png"></a><a href="http://www.douban.com/people/23446096" target="_blank"><img alt="Douban_48" src="http://assets3.jianshu.io/assets/douban_48-be5d39195c94e54ddf7077ed2fa27901.png"></a>
                             </div>
                         </div>
-                        <div class="paramTitle">{{title}}</div>
-                        <div id="paramMetrics" ms-with="metric">
+                        <div class="MparamTitle">{{title}}</div>
+                        <div id="MparamMetrics" ms-with="metric">
                             <span class="paramMetric">
                                 <span class="paramMetricKey">{{$key}}</span><span class="paramMetricVal">
                                     <span class="paramMetricValText">{{$val.val}}/{{$val.top}}</span>
@@ -70,7 +70,7 @@
                                 </span>
                             </span>
                         </div>
-                        <div id="paramPics" ms-if="pics.length!=0">
+                        <div id="MparamPics" ms-if="pics.length!=0">
                           <ul id="slider" class="rslides" ms-each-pic="pics" data-each-rendered="detailParamRendered">
                             <li>
                               <img ms-src="pic.addr" alt="">
@@ -81,7 +81,7 @@
                             <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
                             </div>
                         </div>
-                        <div id="detailParamContent" ms-html="content"></div>
+                        <div id="MparamContent" ms-html="content"></div>
                     </div>
                 </div>
 
@@ -97,32 +97,32 @@
                                 <div class="row">
                                     <span class="metricInput">{{$key}}</span>
                                     <span class="metricInput">{{$val}}</span>
-                                    <a class="btn" ms-click="deleteMetric($key)">-</a>
+                                    <a class="Mbtn" ms-click="deleteMetric($key)">-</a>
                                 </div>
                             </div>
                             <div>
                                 <input type="text" class="metricInput" ms-duplex="_newMetric.name" placeholder="指标">
                                 <input type="text" class="metricInput" ms-duplex="_newMetric.num" placeholder="值" ms-keypress="keypressMetric">
-                                <a class="btn" ms-click="addMetric">+</a>
+                                <a class="Mbtn" ms-click="addMetric">+</a>
                             </div>
                         </div>
 
-                        <div class=""><a class="btn" ms-click="publish">发布</a></div>
+                        <div class=""><a class="Mbtn" ms-click="publish">发布</a></div>
                         <!-- <div id="newParamPreview" class="pen"></div> -->
                     </div>
                 </div>
             </div>
             <div id="overview" ms-class="shortcut:viewMode=='param'||viewMode=='newParam'">
-                <div id="brief" ms-if="!choosing" class="brief">
-                    <a id="title" class"eventTitle" ms-href="/event/{{id}}">{{title}}</a>
-                    <div id="intro">{{intro}}</div>
+                <div class="MeventBrief" ms-if="!choosing">
+                    <a class="title" ms-href="/event/{{id}}">{{title}}</a>
+                    <div class="intro">{{intro}}</div>
                 </div>
 
                 <a class="eventChange" ms-if="!choosing&&id!=null&&viewMode=='newEvent'" ms-click="loadMyEvents">选择其他事件</a>
                 <div class="eventChange" ms-if="choosing">选择一个事件</div>
-                
+                <div class="Mloading" ms-if="choosing&&!myEvents.length">正在载入数据...</div>
                 <div id="myEvents" ms-if="choosing" ms-each-myevent = "myEvents">
-                    <div class="brief">
+                    <div class="MeventBrief">
                         <a id="title" class"eventTitle" ms-click="loadEvent(myevent.id)">{{myevent.title}}</a>
                     </div>
                 </div>
@@ -163,21 +163,20 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <div id="newEvent" ms-class="show:viewMode=='newEvent'" ms-controller="createEvent">
+        <div id="newEvent" class="Mpage" ms-class="show:viewMode=='newEvent'" ms-controller="createEvent">
             <div id="newEventForm">
                 <input type="text" id="newEventTitle" placeholder="标题" ms-duplex="newEventTitle">
                 <textarea id="newEventIntro" ms-duplex="newEventIntro" placeholder="简介"></textarea>
                 <div class="">
-                    <a class="btn" ms-class="disable:connecting" ms-click="publish">{{connecting?"保存中":"发布"}}</a>
+                    <a class="Mbtn" ms-class="disable:connecting" ms-click="publish">{{connecting?"保存中":"发布"}}</a>
                 </div>
             </div>
 
         </div>
 
-        <div id="events" ms-class="show:viewMode=='all'" ms-controller="events" ms-each-event="events">
+        <div id="events" class="Mpage" ms-class="show:viewMode=='all'" ms-controller="events" ms-each-event="events">
             <div class="event">
                 <div><a class="eventTitle" ms-href="/event/{{event.nid}}">{{event.title}}</a></div>
                 <div><a class="eventIntro" ms-href="/event/listVm">{{event.body}}</a></div>

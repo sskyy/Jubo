@@ -1,10 +1,16 @@
-//variable
+//===========variable
+
+//layout
+@leftWidth:200px;
+
+//colors
 @metricColor1:#9AC600;
 @metricColor2:#18b6b9;
 @metricColor3:#d6d2a2;
 @metricColor4:#b7dad3;
 @metricColor5:#e8ab79;
 
+//===========global settings
 ::-webkit-scrollbar {
     width: 5px;
     height: 8px;
@@ -36,11 +42,9 @@
 
 
 ::selection {     
-background:#9AC600;     
-color:#fff;     
+    background:#9AC600;     
+    color:#fff;     
 } 
-
-
 
 a:hover {
     text-decoration: none;
@@ -64,7 +68,20 @@ a {
     text-decoration: none;
 }
 
-.btn{
+//===========modules
+
+/*
+命名规则:
+    1.id和class如果第一个字母是大写，表示有特殊含义，可以单独控制样式。
+      否则认为只是标示符。
+    2.大写字母分别意义如下：
+      C : 容器
+      P : 页面容器
+      M : 模块
+      J : js选择器
+*/
+
+.Mbtn{
     display: inline-block;
     padding: 6px 12px;
     color: #fff;
@@ -88,11 +105,18 @@ a {
 .hide{
     display: none;
 }
-.show{
-    display: block;
+
+.Mpage{
+    display: none;
+    margin: 0;
+    padding: 0;
+    &.show{
+        display: block;
+    }
 }
 
 input[type="text"],input[type="password"]{
+    display: inline-block;
     border-width:0;
     border-bottom:1px #ccc solid;
     font-size: 14px;
@@ -103,7 +127,7 @@ input[type="text"],input[type="password"]{
     }
 }
 
-.inputLabel{
+.MinputLabel{
     width: 60px;
     margin-right: 20px;
     display: inline-block;
@@ -111,7 +135,7 @@ input[type="text"],input[type="password"]{
     font-size: 14px;
 }
 
-.modal{
+.Mmodal{
     position: absolute;
     z-index: 9999;
     margin: 0 auto;
@@ -151,9 +175,18 @@ input[type="text"],input[type="password"]{
         color: #ccc;
     }
 }
+
+.Mloading{
+    color:#777;
+    position: relative;
+    width: 200px;
+    font-size: 14px;
+    font-style: italic;
+    margin: -10px auto 0;
+    top: 50%;
+    text-align: center;
+}
 //
-
-
 
 
 
@@ -167,9 +200,9 @@ html,body{
     background: #ededef;
     font-family: "Hiragino Sans GB","Hiragino Sans GB W3","Microsoft YaHei","微软雅黑",tahoma,arial,simhei,"黑体";
 }
-.left{
+#Cleft{
     height: 100%;
-    width: 200px;
+    width: @leftWidth;
     background: #20252B;
     position: absolute;
     top:0;
@@ -187,18 +220,17 @@ html,body{
     }
 }
 
-.right{
+#Cright{
     position: relative;
     height: 100%;
-    margin: 0 0 0px 200px;
+    margin-left:@leftWidth;
     overflow: hidden;
     overflow-y: hidden;
     box-shadow: -2px 0 2px #333;
-
 }
 
 
-#event{
+#Mevent{
     display: none;
     width: 100%;
     height: 100%;
@@ -208,7 +240,7 @@ html,body{
 }
 
 //#brief change for common use//
-.brief{
+.MeventBrief{
     width: 620px;
     margin-bottom: 10px;
     margin: 10px auto;
@@ -216,7 +248,7 @@ html,body{
     background: #fff;
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
     
-    #title{
+    .title{
         color:#555;
         font-size: 24px;
         font-weight: bold;
@@ -231,7 +263,7 @@ html,body{
         }
     }
 
-    #intro{
+    .intro{
         font-size: 14px;
         color:#878787;
         line-height: 20px;
@@ -288,11 +320,11 @@ html,body{
     line-height: 17px;
     overflow: hidden;
 
-    -webkit-transition: all .25s;
-    -moz-transition: all .25s;
-    -ms-transition: all .25s;
-     -o-transition: all .25s;
-        transition: all .25s;
+    -webkit-transition: top .25s;
+    -moz-transition: top .25s;
+    -ms-transition: top .25s;
+     -o-transition: top .25s;
+        transition: top .25s;
 }
 
 a.param{
@@ -414,10 +446,10 @@ a.param{
                 margin-top: 0;
             }
         }
-        .brief{
+        .MeventBrief{
             width: 160px;
             margin: 10px 0px 10px 10px;
-            #intro{
+            .intro{
                 display: none
             }
         }
@@ -433,6 +465,13 @@ a.param{
                     cursor: pointer;
                 }
             }
+        }
+        .param{
+            -webkit-transition: top left .25s;
+            -moz-transition: top left .25s;
+            -ms-transition: top left .25s;
+             -o-transition: top left .25s;
+                transition: top left .25s;
         }
     }    
     #metrics{
@@ -489,13 +528,13 @@ a.param{
 
 }
 
-#paramContainer{
+#CdetailParam{
     position: relative;
     margin-left: 205px;
     height: 100%;
 }
 
-#detailParam{
+#MdetailParam{
     position: absolute;
     left:0;
     top:0;
@@ -507,12 +546,12 @@ a.param{
     overflow-y: scroll;
     box-shadow:-2px 0px 5px #777;
     box-sizing:border-box;
-    #paramBody{
+    #CparamBody{
         position: relative;
         width: 620px;
         margin: 0 auto;
 
-        #detailParamContent{
+        #MparamContent{
             width: 100%;
             margin: 0 auto;
             font-size: 18px;
@@ -526,7 +565,7 @@ a.param{
             }
         }
 
-        #paramAuthor{
+        #MparamAuthor{
             position: absolute;
             top:20px;
             right: 700px;
@@ -589,7 +628,7 @@ a.param{
             }
         }
 
-        .paramTitle{
+        .MparamTitle{
             font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
             font-size: 50px;
             font-weight: 700;
@@ -597,7 +636,7 @@ a.param{
             margin-bottom: 20px;
             margin-left: -8px;
         }
-        #paramMetrics{
+        #MparamMetrics{
             width: 100%;
             text-align: left;
             .paramMetric{
@@ -663,7 +702,7 @@ a.param{
             }
         }
 
-        #paramPics{
+        #MparamPics{
                 width: 100%;
                 height: 350px;
                 position: relative;
@@ -860,7 +899,6 @@ a.viewMode{
 }
 
 #newEvent{
-    display: none;
     position: absolute;
     top: 0;
     left:0;
@@ -921,7 +959,6 @@ a.viewMode{
 }
 
 #events{
-    display: none;
     height: 100%;
     width: 100%;
     padding-top: 20px;
@@ -968,14 +1005,3 @@ a.viewMode{
     }
 }
 
-
-#loading{
-    color:#777;
-    position: relative;
-    // text-shadow: 1px 1px 0 #666;
-    width: 200px;
-    font-size: 14px;
-    font-style: italic;
-    margin: -10px auto 0;
-    top: 50%;
-}
