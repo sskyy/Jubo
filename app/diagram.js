@@ -4,34 +4,34 @@ define([], function(  ) {
     var defaults = {
             wUnit : 200,
             hUnit : 100,
-            wParam : 180,
+            wPiece : 180,
             lines : 6,
             hContainer : 550,
             hContainerbottom:10,
+            diagramContainerSelector :"#diagramContainer",
             diagramSelector : '#diagram',
-            paramSelector : '.param',
-            paramsSelector : "#params",
+            pieceSelector : '.piece',
+            piecesSelector : "#pieces",
             bgSelector : '#diagramBg',
             svgSelector : '#metricLines',
             svgContainerSelector : '#metricLinesContainer',
-            paramLineOffset : 50,
+            pieceLineOffset : 50,
             currentMetricColor : "#9AC600",
             metricColor : "#ddd",
             metricColors :["#9AC600","#18b6b9","#b7dad3","#d6d2a2","#e8ab79"],
             hCanvas : 620}
 
-    defaults.lineOffset = defaults.hUnit/2,
-    defaults.wContainer = document.querySelector( defaults.diagramSelector).clientWidth,
-    defaults.containerLines = parseInt((document.body.clientHeight-200)/defaults.hUnit),
-    defaults.containerGrid = parseInt( defaults.wContainer /defaults.wUnit)
-
     var calDiagramArgs = function(event){
-        var args = _.extend({},defaults)
-        args.params = event.params,
-        args.metrics = event.metrics,
-        args.cols = args.params.length > args.containerGrid ? args.params.length + 1 : args.containerGrid
-        args.wParams = args.params.length*args.wUnit
-        args.colOffset = ((args.wContainer- args.wParams)/2 + args.wUnit/2)%args.wUnit
+        var args = _.clone(defaults)
+        args.lineOffset = defaults.hUnit/2
+        args.wContainer = document.querySelector( defaults.diagramSelector).clientWidth
+        args.containerLines = parseInt((document.body.clientHeight-200)/defaults.hUnit)
+        args.containerGrid = parseInt( args.wContainer /defaults.wUnit)
+        args.pieces = event.pieces
+        args.metrics = event.metrics
+        args.cols = args.pieces.length > args.containerGrid ? args.pieces.length + 1 : args.containerGrid
+        args.wPieces = args.pieces.length*args.wUnit
+        args.colOffset = ((args.wContainer- args.wPieces)/2 + args.wUnit/2)%args.wUnit
 
         return args
     }
@@ -87,7 +87,7 @@ define([], function(  ) {
         }
 
         return function( args ){
-            var canvasWidth = _.max([args.wParams ,args.wContainer])
+            var canvasWidth = _.max([args.wPieces ,args.wContainer])
 
             rendered && ctx.clearRect ( 0 , 0 , canvasWidth , args.hCanvas )
 
@@ -104,7 +104,7 @@ define([], function(  ) {
             function renderMatrix(colWidth, lineHeight, cols, lines, colOffset, lineOffset) {
                 colOffset = colOffset || 0
                 lineOffset = lineOffset || 0
-                for (var i = 0; i < cols; i++) {
+                for (var i = 0; i < cols+1; i++) {
                     yline(i * colWidth + colOffset, (lines-1) * lineHeight + lineOffset, 0)
                 }
                 for (var j = 0; j < lines; j++) {
@@ -118,18 +118,74 @@ define([], function(  ) {
     //TODO
     //计算DOM布局，要分metric！！！
     ////////////////////////////////////
+  
+    function inDiagramArea(e){
+        var y = e.pageY? e.pageY : e.clientY + document.body.scrollTop  - document.body.clientTop,
+            $diagramContainer = $(defaults.diagramContainerSelector)
+
+        return ( y > $diagramContainer.offset().top 
+            && y < $diagramContainer.offset().top + $diagramContainer.outerHeight() ) ? true : false
+    }
+
+    var bindWheelEvent = (function(){
+        var hasScroll = false,
+            mouseIn = false
+
+        var eventName = "mousewheel";
+        try {
+            //FF需要用DOMMouseScroll事件模拟mousewheel事件
+            document.createEvent("MouseScrollEvents");
+            eventName = "DOMMouseScroll"
+        } catch (e) {
+        }
+
+        var d = 0,
+            scrollMaxWidth = 0
+
+        document.addEventListener(eventName, function(e) {
+            if ( hasScroll && inDiagramArea(e) ) { // 只有滚动条出现时才进入此分支
+                //stop y scroll
+                e.preventDefault()
+                e.stopPropagation()
+                if (eventName == "DOMMouseScroll") {
+                    d += (e.detail / 3)
+                } else {//如果滚得太快，会出现240， 360等值，全部统一为-1与1
+                    d += e.wheelDelta > 0 ? -1 : 1
+                }
+
+                var t = Math.floor(d * 15)
+                if (t >= scrollMaxWidth) {
+                    --d
+                    return
+                }
+                if (t < 0) {
+                    ++d
+                    return
+                }
+                document.querySelector(defaults.diagramContainerSelector).scrollLeft = t
+            }
+        })
+
+        return function( args ){
+            hasScroll = args.wContainer < args.wPieces ? true : false
+            scrollMaxWidth = hasScroll ? args.wPieces - args.wContainer : 0
+        }
+
+    })()
+
+
 
     var renderDom = function( event, diagramArgs, viewMode ){
-        var params = document.querySelectorAll(diagramArgs.paramSelector),
+        var pieces = document.querySelectorAll(diagramArgs.pieceSelector),
             isShortcutModel = (viewMode!="event") ? true:false,
             positionKey = isShortcutModel ? 'shortcut-position' : 'position'
 
-        $(diagramArgs.paramsSelector).width(diagramArgs.wParams)
+        $(diagramArgs.piecesSelector).width(diagramArgs.wPieces)
         
-        console.log("DEB: rendering DOM", params.length,diagramArgs.wParams, positionKey)
+        console.log("DEB: rendering DOM", pieces.length,diagramArgs.wPieces, positionKey)
         
-        if( params.length!=0 && !$(params[0]).data(positionKey)){
-            diagramArgs.paramsPos = []
+        if( pieces.length > 1 && !$(pieces[0]).data(positionKey)){
+            diagramArgs.piecesPos = []
             if( !isShortcutModel ){
                 var metricsKeys = _.keys(event.metrics.$model)
                 for( var i=0,length=metricsKeys.length;i<length;i++ ){
@@ -137,66 +193,85 @@ define([], function(  ) {
                         metricTop = event.metrics[metricName].top,
                         metricBottom = event.metrics[metricName].bottom,
                         metricRange = metricTop - metricBottom,
-                        bottomDomHeight = $(_.min( params, function( param){ return param['data-param'].metric[metricName]})).outerHeight()
+                        tempbottomDomHeight = 330,
+                        bottomDomHeight = $(_.max( _.map( pieces, function( piece){
+                            // console.log( "max ",metricTop , piece['data-piece'].metrics[metricName] )
+                            var bottom = (metricTop - piece['data-piece'].metrics[metricName])*(diagramArgs.hContainer-tempbottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-tempbottomDomHeight) 
+                                + $(piece).outerHeight()
+                            return [piece, bottom]
+                        }),function(pieceWithbottom){
+                            return pieceWithbottom[1]
+                        })).outerHeight()
+
+                        console.log( "bottom", metricName, bottomDomHeight)
+
                     
-                    _.each(params, function( param, j){
-                        var paramVm = param['data-param'],
-                            paramMetric = paramVm.metric[metricName],
-                            position = $(param).data(positionKey) || {}
+                    _.each(pieces, function( piece, j){
+                        var pieceVm = piece['data-piece'],
+                            pieceMetric = pieceVm.metrics[metricName],
+                            position = $(piece).data(positionKey) || {}
 
                         position[metricName] = {
-                            left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wParam)/2,
-                            top : (metricTop - paramMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
+                            left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2,
+                            top : (metricTop - pieceMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                         }
                         // console.log("DEB: setting position for", positionKey,position)
-                        $(param).data(positionKey, position)
+                        if( position[metricName].top > 1000){
+                            console.log( piece, metricTop , pieceMetric, diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom,metricTop-metricBottom,metricTop,metricBottom )
+                        }
+                        $(piece).data(positionKey, position)
 
-                        // paramVm.el = {position:position}
+                        // pieceVm.el = {position:position}
                         // console.log("i",i)
                         if( i == length-1 ){
-                            // console.log("DEB: setting position for param", positionKey,position)
-                            diagramArgs.paramsPos.push( position )
+                            // console.log("DEB: setting position for piece", positionKey,position)
+                            diagramArgs.piecesPos.push( position )
                         }
                     })
                 }
-                console.log("DEB: NOT shortcut model", viewMode, diagramArgs.paramsPos)
+                console.log("DEB: NOT shortcut model", viewMode, diagramArgs.piecesPos)
             }else{
                 var stack = 0    
-                _.each(params, (function( param, i ){
-                    return function( param, i){
-                        $(param).data(positionKey, {
+                _.each(pieces, (function( piece, i ){
+                    return function( piece, i){
+                        $(piece).data(positionKey, {
                             left:0,
                             top: stack
                         })
-                        stack += $(params[i]).outerHeight() + 10
+                        stack += $(pieces[i]).outerHeight() + 10
                     }
                 })())
                 console.log("DEB: shortcut model")
 
             }
         }else{
-            if( params.length !=0 && $(params[0]).data(positionKey)){
-                console.log("DEB: param Dom aready have position", viewMode, positionKey)
+            if( pieces.length !=0 && $(pieces[0]).data(positionKey)){
+                console.log("DEB: piece Dom aready have position", viewMode, positionKey)
             }
         }
 
-        _.each(params, function( param){
-            if( !isShortcutModel ){
-                $(param).css( $(param).data(positionKey)[event.currentMetric] )
-            }else{
-                $(param).css( $(param).data(positionKey) )
-            }
-        })
+        if(event.currentMetric){
+            _.each(pieces, function( piece){
+                if( !isShortcutModel){
+                    $(piece).css( $(piece).data(positionKey)[event.currentMetric] )
+                }else{
+                    $(piece).css( $(piece).data(positionKey) )
+                }
+            })
+        }
 
-        return params
+        bindWheelEvent(diagramArgs)
+
+        return pieces
     }
 
-    // must execute after renderDom, cause we need div.param position
+    // must execute after renderDom, cause we need div.piece position
     var renderSvg = (function(){
         var rendered = false,
             svg,
             paths = {},
-            lastId
+            lastId,
+            lastPieceLength
 
 
         return function(event, diagramArgs, viewMode, diagramRendered){
@@ -251,7 +326,7 @@ define([], function(  ) {
             }
 
             function setCurrentPath( metric ){
-                paths[metric].attr({
+                metric && paths[metric].attr({
                     strokeOpacity : 0.5
                 })
             }
@@ -265,7 +340,7 @@ define([], function(  ) {
             
                 if( rendered ){
                     console.log("DEB: svg second rendering")
-                    if( lastId == event.id ){
+                    if( lastId == event.id && lastPieceLength == event.pieces.length){
                         return 
                     }else{
                         svg.clear()
@@ -273,18 +348,18 @@ define([], function(  ) {
                 }else{
                     console.log("DEB: svg first rendering")
                 }
-                $(diagramArgs.svgContainerSelector).width(diagramArgs.wParams)
+                $(diagramArgs.svgContainerSelector).width(diagramArgs.wPieces)
 
                 var index = 0
                 _.each( _.keys(event.metrics.$model), function(metric){
                     var points = [];
 
-                    for( var i in diagramArgs.paramsPos ){
+                    for( var i in diagramArgs.piecesPos ){
                         // points.push( (j*diagramArgs.wUnit + diagramArgs.colOffset).toString()
                         //  + " " 
-                        //  + (diagramArgs.paramsPos[i][j]).toString())
-                        points.push([diagramArgs.paramsPos[i][metric].left + diagramArgs.wParam/2,
-                            diagramArgs.paramsPos[i][metric].top + diagramArgs.paramLineOffset])
+                        //  + (diagramArgs.piecesPos[i][j]).toString())
+                        points.push([diagramArgs.piecesPos[i][metric].left + diagramArgs.wPiece/2,
+                            diagramArgs.piecesPos[i][metric].top + diagramArgs.pieceLineOffset])
                     }
                     // console.log("DEB: SVG points", points)
                     renderPath( points, metric, index )
@@ -292,6 +367,7 @@ define([], function(  ) {
                 })
                 setCurrentPath( event.currentMetric )
                 lastId = event.id
+                lastPieceLength = event.pieces.length
                 rendered = true
             }
         }
@@ -323,7 +399,7 @@ define([], function(  ) {
                     if( !vmodel.loading ){
                         diagramArgs = calDiagramArgs( vmodel )
                         renderDom( vmodel, diagramArgs, general.viewMode)
-                        renderSvg( )
+                        renderSvg()
                     }
                 })
             }

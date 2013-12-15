@@ -11,6 +11,7 @@
     <script src="./lib/page.js"></script>
     <script src="./lib/pen/pen.js"></script>
     <script src="./lib/responsiveslides.js"></script>
+    <script src="./lib/dropzone.js"></script>
     <link href="./css/main.css" type="text/css" rel="stylesheet"/>
     <link href="./css/responsiveslide.css" type="text/css" rel="stylesheet"/>
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
@@ -34,15 +35,15 @@
         <div class="navs">
             <a class="viewMode" href="/event/list">时光旅行</a>
             <a class="viewMode" href="/create/event">创建事件</a>
-            <a class="viewMode" href="/create/param">创建片段</a>
+            <a class="viewMode" href="/create/piece">创建片段</a>
         </div>
     </div>
 
     <div id="Cright" ms-controller="event">
         <div class="Mloading" ms-if="loading">正在载入数据...</div>
-        <div id="Mevent" class="Mpage" ms-class="show:!loading&&(viewMode=='event'||viewMode=='param'||viewMode=='newParam')">
+        <div id="Mevent" class="Mpage" ms-class="show:!loading&&(viewMode=='event'||viewMode=='piece'||viewMode=='newPiece')">
             <div id="CdetailPiece">
-                <div id="MdetailPiece" ms-class="hide:viewMode!='param'" ms-class="hide:viewMode!='param'" ms-controller="detailParam">
+                <div id="MdetailPiece" ms-class="hide:viewMode!='piece'" ms-controller="detailPiece">
                     <div id="CpieceBody">
                         <div id="MpieceAuthor">
                             <a href="/users/s27zLn" class="author name">
@@ -60,7 +61,7 @@
                             </div>
                         </div>
                         <div class="MpieceTitle">{{title}}</div>
-                        <div id="MpieceMetrics" ms-with="metric">
+                        <div id="MpieceMetrics" ms-with="metricsVal">
                             <span class="pieceMetric">
                                 <span class="pieceMetricKey">{{$key}}</span><span class="pieceMetricVal">
                                     <span class="pieceMetricValText">{{$val.val}}/{{$val.top}}</span>
@@ -85,12 +86,14 @@
                     </div>
                 </div>
 
-                <div id="newParam" ms-class="hide:viewMode!='newParam'" ms-controller="createParam">
-                    <div id="newParamForm">
-                        <input type="text" id="newParamTitle" placeholder="标题" ms-duplex="newTitle">
-                        <div id="newParamAlbum">创建相册</div>
-                        <div id="newParamMenu"></div>
-                        <div id="newParamContent"></div>
+                <div id="newPiece" ms-class="hide:viewMode!='newPiece'" ms-controller="createPiece">
+                    <div id="newPieceForm">
+                        <input type="text" id="newPieceTitle" placeholder="标题" ms-duplex="newTitle">
+                        <div id="newPieceAlbum">
+                            <div id="newPieceAlbumPreview"></div>
+                        </div>
+                        <div id="newPieceMenu"></div>
+                        <div id="newPieceContent"></div>
 
                         <div id="newMetricForm">
                             <div ms-with="newMetrics" id="newMetrics">
@@ -108,14 +111,14 @@
                         </div>
 
                         <div class=""><a class="Mbtn" ms-click="publish">发布</a></div>
-                        <!-- <div id="newParamPreview" class="pen"></div> -->
+                        <!-- <div id="newPiecePreview" class="pen"></div> -->
                     </div>
                 </div>
             </div>
-            <div id="overview" ms-class="shortcut:viewMode=='param'||viewMode=='newParam'">
+            <div id="overview" ms-class="shortcut:viewMode=='piece'||viewMode=='newPiece'">
                 <div class="MeventBrief" ms-if="!choosing">
                     <a class="title" ms-href="/event/{{id}}">{{title}}</a>
-                    <div class="intro">{{intro}}</div>
+                    <div class="intro">{{content}}</div>
                 </div>
 
                 <a class="eventChange" ms-if="!choosing&&id!=null&&viewMode=='newEvent'" ms-click="loadMyEvents">选择其他事件</a>
@@ -139,25 +142,25 @@
                             <svg id="metricLines"></svg>
                         </div>
                         
-                        <svg id="brackets" class="brackets" ms-if="currentParam">
-                            <path ms-if="currentParam.index!=0" ms-attr-d="'M'+((currentParam.index)*200-100)+' 550 Q'+((currentParam.index)*200-100)+' 560 '+((currentParam.index)*200-50)+' 560 T'+((currentParam.index)*200)+' 570 Q'+((currentParam.index)*200)+' 560 '+((currentParam.index)*200+50)+' 560 T'+((currentParam.index)*200+100)+' 550'" fill="none" stroke="#cccccc" ></path>
-                            <path ms-if="!(currentParam.index==params.length-1)" ms-attr-d="'M'+((currentParam.index)*200+100)+' 550 Q'+((currentParam.index)*200+100)+' 560 '+((currentParam.index)*200+150)+' 560 T'+((currentParam.index)*200+200)+' 570 Q'+((currentParam.index)*200+200)+' 560 '+((currentParam.index)*200+250)+' 560 T'+((currentParam.index)*200+300)+' 550'" fill="none" stroke="#cccccc" ></path>              
+                        <svg id="brackets" class="brackets" ms-if="currentPiece">
+                            <path ms-if="currentPiece.index!=0" ms-attr-d="'M'+((currentPiece.index)*200-100)+' 550 Q'+((currentPiece.index)*200-100)+' 560 '+((currentPiece.index)*200-50)+' 560 T'+((currentPiece.index)*200)+' 570 Q'+((currentPiece.index)*200)+' 560 '+((currentPiece.index)*200+50)+' 560 T'+((currentPiece.index)*200+100)+' 550'" fill="none" stroke="#cccccc" ></path>
+                            <path ms-if="!(currentPiece.index==pieces.length-1)" ms-attr-d="'M'+((currentPiece.index)*200+100)+' 550 Q'+((currentPiece.index)*200+100)+' 560 '+((currentPiece.index)*200+150)+' 560 T'+((currentPiece.index)*200+200)+' 570 Q'+((currentPiece.index)*200+200)+' 560 '+((currentPiece.index)*200+250)+' 560 T'+((currentPiece.index)*200+300)+' 550'" fill="none" stroke="#cccccc" ></path>              
                             
                         </svg>
 
-                        <div id="params">
-                            <div ms-each-param="params"  data-each-rendered="paramRendered">
-                                <a ms-attr-id="'param'+($index+1)" ms-data-param="param" class="param" ms-mouseenter="active(param)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/param/'+param.id">
-                                    <div class="cover" ms-class="show:param.cover" ><img ms-src="param.cover"/></div>
-                                    <div class="title">{{param.title}}</div>
-                                    <div class="text">{{param.content}}</div>
+                        <div id="pieces">
+                            <div ms-each-piece="pieces"  data-each-rendered="pieceRendered">
+                                <a ms-attr-id="'piece'+($index+1)" ms-data-piece="piece" class="piece" ms-mouseenter="active(piece)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/piece/'+piece.id">
+                                    <div class="cover" ms-if="piece.cover" ><img ms-src="'http://127.0.0.1:1337/image/thumb/'+piece.cover"/></div>
+                                    <div class="title">{{piece.title}}</div>
+                                    <div class="text">{{piece.content|stripHTML|truncate(140,"...")}}</div>
                                     <div class="more">!</div>
                                 </a>
                             </div>
 
-                            <div id="dates" ms-each-param="params">
-                                <div class="time" ms-attr-style="'left:'+($index*200+50)+'px;'">{{param.timeText}}</div>
-                                <div class="time fromLast" ms-attr-style="'left:'+($index*200-50)+'px;'" ms-if='param.fromLast'>{{param.fromLast}}</div>
+                            <div id="dates" ms-each-piece="pieces">
+                                <div class="time" ms-attr-style="'left:'+($index*200+50)+'px;'">{{piece.timeText}}</div>
+                                <div class="time fromLast" ms-attr-style="'left:'+($index*200-50)+'px;'" ms-if='piece.fromLast'>{{piece.fromLast}}</div>
                             </div>
                         </div>
                     </div>

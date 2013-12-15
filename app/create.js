@@ -1,88 +1,140 @@
 define(['./util'], function(util) {
     var exports = {},
         baseUrl = "http://127.0.0.1:1337/",
-        paramContentSelector="#newParamContent",
-        paramMenuSelector = "#newParamMenu",
-        previewSelector = "#newParamPreview",
-        createNodeAddr = baseUrl+"event",
-        addRelationAddr = "http://127.0.0.1:8080/drupal/api/relation.json"
+        pieceContentSelector="#newPieceContent",
+        pieceMenuSelector = "#newPieceMenu",
+        previewSelector = "#newPiecePreview",
+        albumUploadSelector = "#newPieceAlbum",
+        albumPreivewSelector = "#newPieceAlbumPreview",
+        pieceCoverClass= "pieceCover",
+        eventAddr = baseUrl+"event",
+        pieceAddr = baseUrl+"piece",
+        imageAddr = baseUrl + "image",
+        addRelationAddr = "http://127.0.0.1:8080/drupal/api/relation.json",
+        uploadImageAddr = baseUrl+"image/upload"
 
 
-    exports.newParamVm = (function(){
+    exports.newPieceVm = (function(){
         var createVm
+
+        var initUploader = (function(){
+            var uploader
+            return function( selector, pid ){
+                if( uploader ){
+                    uploader.destroy()
+                }
+                console.log("begin to init dropzone")
+                uploader = new Dropzone(selector, { 
+                    url: uploadImageAddr+'?pid='+pid,
+                    withCredentials: true,
+                    addRemoveLinks : true,
+                    previewsContainer : albumPreivewSelector,
+                    clickable: true,
+                    dictRemoveFile : '删除',
+                    dictDefaultMessage :'上传图片',
+                    dictCancelUpload : '取消',
+                    previewTemplate : '<div class="dz-preview dz-file-preview">'+
+                      '<div class="dz-details">'+
+                        '<div class="dz-filename"><span data-dz-name></span></div>'+
+                        '<div class="dz-size" data-dz-size></div>'+
+                        '<img data-dz-thumbnail />'+
+                      '</div>'+
+                      '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>'+
+                      '<div class="dz-error-mark"><span>✘</span></div>'+
+                      '<div class="dz-error-message"><span data-dz-errormessage></span></div>'+
+                    '</div>'
+
+                });
+                uploader.on("removedfile",function(file){
+                    console.log("remove file", file)
+                    util.api({
+                        url : imageAddr + "/" +file.id,
+                        type : "delete"
+                    })
+                    createVm.pics = _.without(createVm.pics.$model, file.id)
+                })
+                uploader.on("success",function(file, res){
+                    console.log("DEB: image upload suscess",res,file)
+                    file.id = res.id
+                    createVm.pics.push( res.id )
+
+                    var removeButton = Dropzone.createElement("<a>设为封面</a>");
+                    var _this = this;
+                    removeButton.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log("set to cover",res.id)
+                        createVm.cover = res.id
+                        $(albumPreivewSelector).children().removeClass(pieceCoverClass)
+                        $(file.previewElement).addClass(pieceCoverClass)
+
+                    });
+
+                    file.previewElement.appendChild(removeButton);
+
+                })
+                util.getCsrfToken().done( function(token ){
+                    uploader.on("sending", function(file, xhr) { xhr.setRequestHeader("X-CSRF-Token", token); });
+                })
+            }
+        })()
+
+        var Editor = (function(){
+            var editor
+            return function(get){
+                if( get ){
+                    return editor?editor.innerHTML : ''
+                }
+
+                if( editor ){
+                    editor.innerHTML = ""
+                    return editor
+                }
+
+                editor = document.querySelector(pieceContentSelector),
+                pen = new Pen({
+                    editor : editor,
+                    menu : pieceMenuSelector,
+                    stay : false
+                })
+                console.log("init pen")
+                return editor
+            }
+        })()
+
         return function( general){
             if( !createVm ){
-                //init pen
-                var editor = document.querySelector(paramContentSelector),
-                    pen = new Pen({
-                        editor : editor,
-                        menu : paramMenuSelector,
-                        stay : false
-                    })
-
-                createVm = avalon.define("createParam",function(vm){
+                createVm = avalon.define("createPiece",function(vm){
                     // vm.name="aaaa"
                     vm.newTitle = ""
                     vm._newMetric = {
                         name : "",
                         num : null
                     }
+                    vm.pics = []
                     vm.newMetrics = {}
                     vm._metricKeys = []
+                    vm._csrf = ''
                     vm.publish = function(){
-                        $(previewSelector).html( editor.innerHTML )
-                        if( !general.getEventId() ){
+                        var eid = general.getEventId() 
+                        // $(previewSelector).html( editor.innerHTML )
+                        if( !eid){
                             alert("请选择你要将此片段插入的事件")
                             return 
                         }
                         util.api({
-                            url : createNodeAddr,
+                            url : pieceAddr,
                             type:"POST",
                             data:{
-                                type: "param",
+                                eid : eid,
                                 title : vm.newTitle,
-                                body : {
-                                    und : [{
-                                        value : editor.innerHTML,
-                                        format:"filtered_html"
-                                    }]
-                                },
-                                field_metric:{
-                                    und:_.map(vm.newMetrics.$model,function(metricNum,metricName){
-                                        return {value:metricName+":"+metricNum}
-                                    })
-                                }
+                                content : Editor(true),
+                                metrics:vm.newMetrics.$model,
+                                pics : vm.pics.$model
                             }
                         }).done(function(res){
-                            console.log("DEB: param add success",res)
-                            vm.addRelation(res.nid, general.getEventId())
-                        })
-                    }
-                    vm.addRelation = function( pid, eid){
-                        console.log("DEB: adding relation", pid, eid)
-                        return util.api({
-                            url : addRelationAddr,
-                            type : "POST",
-                            data:{
-                                "relation_type": "is_param_of",
-                                "endpoints": {
-                                    "und": [
-                                        {
-                                            "entity_type": "node",
-                                            "entity_id": pid,
-                                            "r_index": "0"
-                                        },
-                                        {
-                                            "entity_type": "node",
-                                            "entity_id": eid,
-                                            "r_index": "1"
-                                        }
-                                    ]
-                                }
-                            }
-                        }).done(function(){
-                            console.log("SUS: add Relation for", pid, eid, "suscess")
-                            page("/event/"+eid+"?refresh=true")
+                            console.log("DEB: piece add success",res)
+                            page('/event/' + eid+"?refresh=true")
                         })
                     }
                     vm.keypressMetric = function( $e ){
@@ -110,8 +162,24 @@ define(['./util'], function(util) {
                             vm.newMetrics = _.omit(vm.newMetrics.$model, metricName)
                         }
                     }
-
+                    vm.reset = function(){
+                        initUploader(albumUploadSelector, general.getPieceId())
+                        Editor()
+                        vm.newTitle = ""
+                        vm.newMetrics = {}
+                        vm._newMetric.name = ""
+                        vm._newMetric.num = null
+                    }
                 })   
+
+                general.$watch('viewMode',function(viewMode){
+                    console.log("reset editor",viewMode)
+                    if( viewMode == 'newPiece'){
+                        console.log("reset editor")
+                        createVm.reset()
+                    }
+                })
+
             }
 
             return createVm
@@ -130,10 +198,9 @@ define(['./util'], function(util) {
                         if( vm.connecting) return 
                         vm.connecting = true
                         util.api({
-                            url:createNodeAddr,
+                            url:eventAddr,
                             type:"POST",
                             data:{
-                                type:"event",
                                 title:vm.newEventTitle,
                                 content:vm.newEventIntro
                             }

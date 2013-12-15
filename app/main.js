@@ -1,5 +1,6 @@
-define(['./event','./create','./login','./list'], function( Event, Create,Login,List ) {
+define(['./event','./create','./login','./list','./util'], function( Event, Create,Login,List,util ) {
     moment.lang('zh-cn')
+    util.patch()
 
     var exports = {}
 
@@ -33,12 +34,15 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
         vm.getEventId = function(){
             return eventVm.id
         }
+        vm.getPieceId = function(){
+            return eventVm.getPieceId()
+        }
     })
 
 
     //需要跟全局通信的数据都放在generalVm里面
     var eventVm = Event.vmodel( generalVm ),
-        createVm = Create.newParamVm(generalVm),
+        createVm = Create.newPieceVm(generalVm),
         createEvent = Create.newEventVm(),
         loginVm = Login.vmodel( generalVm ),
         listVm  = List.vmodel()
@@ -62,21 +66,21 @@ define(['./event','./create','./login','./list'], function( Event, Create,Login,
             generalVm.changeView("event")
         })
 
-        page("/create/param",function(){
+        page("/create/piece",function(){
             if( !eventVm.id ){
                 eventVm.loadMyEvents()
             }
-            generalVm.changeView("newParam")
+            generalVm.changeView("newPiece")
         })
 
         page("/create/event",function(ctx){
             generalVm.changeView("newEvent")
         })
 
-        page("/event/:eid/param/:pid",function( ctx,next){
-            // console.log("route to param", ctx.params.eid, ctx.params.pid)
-            generalVm.changeView("param")
-            eventVm.showParam( ctx.params.eid, ctx.params.pid )
+        page("/event/:eid/piece/:pid",function( ctx,next){
+            // console.log("route to piece", ctx.params.eid, ctx.params.pid)
+            generalVm.changeView("piece")
+            eventVm.showPiece( ctx.params.eid, ctx.params.pid )
         })
 
 

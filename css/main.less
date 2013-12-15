@@ -302,12 +302,12 @@ html,body{
     height: 580px;
 }
 
-#params{
+#pieces{
     position: relative;
     margin: -580px auto 0 auto;
     height: 580px;
 }
-.param{
+.piece{
     /*visibility: hidden;*/
     display: block;
     position: absolute;
@@ -328,42 +328,50 @@ html,body{
         transition: top .25s;
 }
 
-a.param{
+a.piece{
+    -webkit-transition: all .25s;
+    -moz-transition: all .25s;
+    -ms-transition: all .25s;
+     -o-transition: all .25s;
+        transition: all .25s;
+
     text-decoration: none;
     &:link{
     }
+    &:hover{
+        box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+    }
 }
 
-.param .cover{
-    display: none;
+.piece .cover{
     box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.2);
     width: 100%;
     height: 100px;
     overflow: hidden;
 }
-.param .cover.show{
+.piece .cover.show{
     display: block;
 }
-.param img{
+.piece img{
     width: 100%;
 }
-.param .text{
+.piece .text{
     padding: 5px;
     color:#666;
     line-height: 160%;
 }
 
-.param:hover{
+.piece:hover{
     /*text-decoration: underline;*/
     cursor: pointer;
 }
-.param .title{
+.piece .title{
     padding: 5px 5px 0px 5px;
     font-weight: bolder;
     color:#676767;
 }
 
-.param .more{
+.piece .more{
     position: absolute;
     top:0px;
     width: 15px;
@@ -441,7 +449,7 @@ a.param{
             margin-left: 0;
             height: auto;
             width: auto;
-            #params{
+            #pieces{
                 position: relative;
                 height: auto !important;
                 margin-top: 0;
@@ -467,7 +475,7 @@ a.param{
                 }
             }
         }
-        .param{
+        .piece{
             -webkit-transition: top left .25s;
             -moz-transition: top left .25s;
             -ms-transition: top left .25s;
@@ -529,7 +537,7 @@ a.param{
 
 }
 
-#CdetailParam{
+#CdetailPiece{
     position: relative;
     margin-left: 205px;
     height: 100%;
@@ -778,7 +786,7 @@ a.param{
 
 }
 
-#newParam{
+#newPiece{
     position: absolute;
     left: 0;
     top:0;
@@ -789,7 +797,7 @@ a.param{
     overflow-x: hidden;
     overflow-y: scroll;
     box-sizing:border-box;
-    #newParamForm{
+    #newPieceForm{
         width: 620px;
         margin: 10px auto 0 auto;
         position: relative;
@@ -821,7 +829,7 @@ a.param{
 
             }
         }
-        #newParamTitle{
+        #newPieceTitle{
             border-width:0;
             border-bottom:1px #ccc solid;
             font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
@@ -835,16 +843,42 @@ a.param{
                 border-bottom: 1px solid #999;
             }
         }
-        #newParamAlbum{
+        #newPieceAlbum{
             background: #9AC600;
             width: 100%;
             padding: 30px 0;
             color: #fff;
             font-size: 20px;
-            text-align: center;
+            text-align: left;
+            .dz-preview{
+                display: inline-block;
+                margin: 10px;
+                .dz-filename{
+                    display: none;
+                }
+                .dz-size{
+                    display: none;
+                }
+                &.dz-success{
+                    .dz-error-mark{
+                        display: none;
+                    }
+                }
+                a{
+                    font-size: 14px;
+                    display: inline-block;
+                    padding: 0 4px;
+                    cursor: pointer;
+                }
+                &.pieceCover{
+                    img{
+                        outline: 3px #fff solid;
+                    }
+                }
+            }
         }
 
-        #newParamContent{
+        #newPieceContent{
             width: 100%;
             margin: 0 auto 10px auto;
             font-size: 18px;
@@ -884,14 +918,14 @@ a.viewMode{
     }
 }
 
-#newParamAlbum{
+#newPieceAlbum{
     margin: 10px 0;
 
 }
-#newParamPreview{
+#newPiecePreview{
     
 }
-.paramTitle{
+.pieceTitle{
     font-family: Georgia,"Times New Roman",Times,"Kai","Kaiti SC","KaiTi","BiauKai","楷体","楷体_GB2312",serif;
     font-size: 50px;
     font-weight: 700;

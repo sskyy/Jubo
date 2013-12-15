@@ -1,90 +1,71 @@
-define(['./diagram','./param','./util'], function(Diagram,Param,util) {
+define(['./diagram','./piece','./util'], function(Diagram,Piece,util) {
     var exports = {},
-        detailParam = Param.vmodel(),
+        detailPiece = Piece.vmodel(),
         baseUrl = "http://127.0.0.1:1337/",
-        eventAddr = baseUrl+"event",
-        myEventsAddr = baseUrl+"me/event",
-        paramsAddr = baseUrl+"param"
+        eventAddr = baseUrl+"event/eventWithPieces/",
+        // myEventsAddr = baseUrl+"me/event",
+        myEventsAddr = baseUrl+"event/",
+        piecesAddr = baseUrl+"piece/piecesById"
 
-    function standardAllFields( params, metrics ){
-        var standardParams = [],
+    function standardAllFields( pieces, metrics ){
+        var standardPieces = [],
             metrics = metrics || {}
-            systemMetricNames = ['阅读']
+            //not use for now
+            // systemMetricNames = ['阅读']
         //get all metrics and set metric to right data structure
         if( _.isEmpty(metrics)){
-            for( var i in params ){
-                //set data structure to {name1:value1,name2:value2}
-                params[i].metric = params[i].metric ? _.object( _.compact(params[i].metric.split(",").map(function(m){
-                    m = m.replace(/(^\s*)|(\s*$)/g, "")
-                    var metricArr = m.indexOf(":")== -1 ? false:m.split(":")
-                    if( metricArr){
-                        //hack for param view count
-                        if( _.indexOf(systemMetricNames,metricArr[0]) != -1 ){
-                            metricArr[1] = params[i][metricArr[0]]
+            for( var i in pieces ){
+                _.each( pieces[i].metrics,function( metricVal, metricName){
+                    metricVal = parseFloat(metricVal)
+                    if( metrics[metricName] == undefined){
+                        // console.log( "DEB: setting metric", metricArr[0], metricArr)
+                        metrics[metricName] = {
+                            top : metricVal,
+                            bottom : metricVal
                         }
-                        //hack end
-
-                        if( metrics[metricArr[0]] == undefined){
-                            // console.log( "DEB: setting metric", metricArr[0], metricArr)
-                            metrics[metricArr[0]] = {
-                                top : parseFloat(metricArr[1]),
-                                bottom : parseFloat(metricArr[1])
-                            }
-                        }else{
-                            if( metricArr[1] > metrics[metricArr[0]].top ){
-                                metrics[metricArr[0]].top = metricArr[1]
-                            }else if(metricArr[1] < metrics[metricArr[0]].bottom){
-                                metrics[metricArr[0]].bottom = metricArr[1]
-                            }
+                    }else{
+                        if( metricVal > metrics[metricName].top ){
+                            metrics[metricName].top = metricVal
+                        }else if(metricVal < metrics[metricName].bottom){
+                            metrics[metricName].bottom = metricVal
                         }
                     }
-                    
-                    return  metricArr
-                }))) : {}
-
+                })
                 
             }
         }
         console.log("DEB: get metircs",metrics)
 
-        for( var i=0,length=params.length;i<length;i++){
-            var param = _.extend(_.pick(params[i],"title","id","time","content","metric"),{
-                time : Date.parse(params[i].time),
-                timeText : moment(params[i].time).format('YYYY-MM-DD'),
+        for( var i=0,length=pieces.length;i<length;i++){
+            var piece = _.extend(_.pick(pieces[i],"title","id","content","metrics","cover"),{
+                time : Date.parse(pieces[i].createdAt),
+                timeText : moment(pieces[i].time).format('YYYY-MM-DD'),
                 isActive :false,
             })
             //store last timestamp
-            params[i].time = Date.parse(params[i].time)
+            pieces[i].time = Date.parse(pieces[i].createdAt)
 
             //calculate time from node to node
             if( i > 0 ){
-                param.fromLast = moment.duration(params[i].time-params[i-1].time).humanize()
+                piece.fromLast = moment.duration(pieces[i].time-pieces[i-1].time).humanize()
             }
 
             for( j in metrics ){
-                if( params[i].metric[j] === undefined){
-                    //fix bug for any metric only appear in one param
+                if( pieces[i].metrics[j] === undefined){
+                    //fix bug for any metric only appear in one piece
                     if( metrics[j].bottom== metrics[j].top){
                         metrics[j].bottom = 0
                     }
-                    params[i].metric[j] = metrics[j].bottom
+                    pieces[i].metrics[j] = metrics[j].bottom
+                }else{
+                    pieces[i].metrics[j] = parseFloat(pieces[i].metrics[j])
                 }
             }
-            //deal with params short of metrics
-            standardParams.push(param)
+            //deal with pieces short of metrics
+            standardPieces.push(piece)
         }
-        console.log( "DEB: standard all fields", [standardParams,metrics])
-        return [standardParams,metrics]
-    }
-
-    function standardEvent( res){
-        var result = {
-            title : res.title,
-            intro : res.body.und[0].value,
-            id : res.nid,
-            args :{}
-        }
-        return result
+        console.log( "DEB: standard all fields", [standardPieces,metrics])
+        return [metrics,standardPieces]
     }
     
     exports.vmodel = (function(){
@@ -92,23 +73,22 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
         return function( general ){
             if( !eventVm){
                 eventVm = avalon.define("event",function(vm){
-                    vm.params = []
+                    vm.pieces = []
                     vm.metrics = {}
                     vm.metircsKeys = []
                     vm.title = null
-                    vm.intro = null
+                    vm.content = null
                     vm.currentMetric = null
-                    vm.currentParam = null
+                    vm.currentPiece = null
                     vm.id = null
                     vm.myEvents = []
                     vm.choosing = false
-                    vm.metrics = {}
                     vm.loading = false
-                    vm.active = function(param){
-                        vm.currentParam = param
+                    vm.active = function(piece){
+                        vm.currentPiece = piece
                     }
                     vm.unactive = function(){
-                        vm.currentParam= null
+                        vm.currentPiece= null
                     }
                     vm.loadEvent = function( id, refresh ){
                         var defer = $.Deferred()
@@ -117,26 +97,16 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                             vm.choosing = false
                             console.log( "DEB: ", refresh? "refresh event" : "load new event" , id)
                             util.api({
-                                url:eventAddr+id+".json",
-                            }).done( function(res){
-                                res = standardEvent(res)
-                                vm.set( res ) 
-                                util.api({
-                                    url : paramsAddr + "&event_id="+id
-                                }).done(function(data){
-                                    vm.loading = false
-                                    var standardFields= standardAllFields(data)
-                                    var params = standardFields[0]
-                                    var metrics = standardFields[1]
-                                    vm.setMetrics( metrics )
-                                    vm.params = params
-                                    defer.resolve(vm)
-                                    console.log("SUS: success to load params for event", id)
-                                }).fail(function(){
-                                    vm.loading = false
-                                    console.log("ERR: failed to load params for event", id)
-                                    defer.reject()
-                                })
+                                url:eventAddr + id,
+                            }).done( function( event){
+                                console.log('DEB: get event',event)
+                                vm.set( event ) 
+                                //call render clear the diagram, cause pieces dom will not render
+                                if( event.pieces.length == 0 ){
+                                    Diagram.render( eventVm, general )
+                                }
+                                vm.loading = false
+                                defer.resolve()
                             }).fail(function(){
                                 vm.loading = false
                                 console.log("ERR: failed to load event", id)
@@ -151,11 +121,11 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         Diagram.preRender()
                         vm.loadEvent( id, refresh )
                     }
-                    vm.showParam = function( eid, pid){
+                    vm.showPiece = function( eid, pid){
                         Diagram.preRender()
-                        $.when( vm.loadEvent( eid ), detailParam.load( pid ) ).done(function(){
-                            console.log("DEB: ready to show param")
-                            detailParam.setEventMetrics(vm.metrics.$model)
+                        $.when( vm.loadEvent( eid ), detailPiece.load( pid ) ).done(function(){
+                            console.log("DEB: ready to show piece")
+                            detailPiece.setEventMetrics(vm.metrics.$model)
                         })
                     }
                     vm.setMetrics = function( metrics ){
@@ -164,18 +134,22 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         vm.currentMetric = vm.currentMetric || _.keys(metrics)[0]
                     }
                     vm.set = function( event ){
-                        vm.currentMetric = event.args.defaultMetric || null
-                        // vm.metricsKeys = event.metrics.length ? event.metrics[0]
-                        //load params seperatly
-                        // event.params = standardParams( event.params )
-                        _.extend( vm, event )
+                        var standardFiels = standardAllFields( event.pieces ),
+                            metricKeys = _.keys( standardFiels[0] )
+
+                        vm.metrics = standardFiels[0]
+                        //for avalon's issue
+                        vm.metricKeys = metricKeys
+                        vm.pieces = standardFiels[1]
+                        vm.currentMetric = event.args.defaultMetric || metricKeys[0]
+                        _.extend( vm, _.pick(event,'id','title','content','uid') )
                     }
                     vm.setCurrentMetric = function( metricName){
                         vm.currentMetric = metricName
                     }
-                    vm.paramRendered = function(a){
-                        if( a == "add" && eventVm.params.length!==0){
-                            console.log("DEB: param dom ready, going to render diagram")
+                    vm.pieceRendered = function(a){
+                        if( a == "add" && eventVm.pieces.length!==0){
+                            console.log("DEB: piece dom ready, going to render diagram")
                             Diagram.render( eventVm, general )
                         }
                     }
@@ -194,6 +168,9 @@ define(['./diagram','./param','./util'], function(Diagram,Param,util) {
                         }).fail(function(){
                             console.log("ERR: load my events failed")
                         })
+                    }
+                    vm.getPieceId = function(){
+                        return detailPiece.id;
                     }
                 })
                 return eventVm

@@ -66,23 +66,16 @@ define(['./util'], function(util) {
 
                 // init user
                 console.log("DEB: checking current user")
-                loginVm.whoami().done(function( data ){
-                    if( data.user.uid != 0){
-                        _.extend(general.user , data.user)
-                        console.log("DEB: Hello ", data.user.name)
+                loginVm.whoami().done(function( user ){
+                    if( user.id != 0){
+                        _.extend(general.user , user)
+                        console.log("DEB: Hello ", user.name)
                     }else{
                         console.log("DEB: current user not login")
                     }
                 }).fail(function(data){
                     console.log("ERR: whoami failed", data)
                 })
-                // loginVm.inputUsername = "root"
-                // loginVm.inputPassword = "rootroot1"
-                // loginVm.login().done(function(){
-                //     // loginVm.whoami().done(function(){
-                //     //     loginVm.logout()
-                //     // })
-                // })
             }
 
             return loginVm
