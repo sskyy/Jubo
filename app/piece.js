@@ -1,22 +1,52 @@
 define(['./util'], function(util) {
     var exports = {},
-        pieceAddr = "http://127.0.0.1:1337/piece/"
-    var renderGallary = function( vmodel ){
-        console.log("DEB: rendering gallery")
-        $("#slider").responsiveSlides({
-            auto: false,
-            pager: false,
-            nav: true,
-            speed: 500,
-            namespace : 'slider',
-            // before : function( i ){
-            //     vmodel.currentPic = i
-            // },
-            before : function( i){
-                vmodel.currentPic = i
+        pieceAddr = "http://127.0.0.1:1337/piece/pieceWithPics/",
+        sliderPrevSelector = ".slideController.prev",
+        sliderNextSelector = ".slideController.next",
+        piecePicSelector = ".piecePic"
+
+    var resetGallary = (function(){
+        var rendered = false,
+            $slide,
+            index = 0,
+            rotater
+
+        function slideTo( i ){
+            if( i<0 || i> $slide.length-1){
+                console.log("ERR: slide out of boudary",i,$slide.length)
             }
-        });
-    }
+            $slide.css({"opacity":0,"z-index":1})
+                .eq(i)
+                .css({"opacity":1,"z-index":2});
+        }
+
+        return function( vm ){
+            //reset global variables
+            $slide = $(piecePicSelector)
+            length = $slide.length
+
+            if( rendered ){
+                return 
+            }else{
+                //add event listener
+                $(sliderNextSelector).click(function(){
+                    if( index < length ){
+                        slideTo( ++index )
+                        vm.currentPic = index
+                    }
+                })
+
+                $(sliderPrevSelector).click(function(){
+                    if( index >0 ){
+                        slideTo( --index )
+                        vm.currentPic = index
+                    }
+                })
+
+            }
+        }
+
+    })()
 
     exports.vmodel = (function(){
         var detailPiece
@@ -63,7 +93,7 @@ define(['./util'], function(util) {
                     }
                     vm.detailPieceRendered = function(a){
                         if( a == "add" && detailPiece.id){
-                            renderGallary( detailPiece )
+                            resetGallary(vm)
                         }
                     }
                 })

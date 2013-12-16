@@ -13,7 +13,6 @@
     <script src="./lib/responsiveslides.js"></script>
     <script src="./lib/dropzone.js"></script>
     <link href="./css/main.css" type="text/css" rel="stylesheet"/>
-    <link href="./css/responsiveslide.css" type="text/css" rel="stylesheet"/>
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
 </head>
 <body ms-controller="general">
@@ -72,14 +71,19 @@
                             </span>
                         </div>
                         <div id="MpiecePics" ms-if="pics.length!=0">
-                          <ul id="JpiecePicsSlider" class="rslides" ms-each-pic="pics" data-each-rendered="detailPieceRendered">
-                            <li>
-                              <img ms-src="pic.addr" alt="">
-                              <p class="caption">{{pic.des}}</p>
-                            </li>
-                          </ul>
-                          <div class="picNav">
-                            <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
+                            <ul id="JpiecePicsSlider" class="rslides" ms-each-pic="pics" data-each-rendered="detailPieceRendered">
+                                <li class="piecePic">
+                                    <img ms-src="'http://127.0.0.1:1337/image/medium/'+pic.id" alt="">
+                                    <p class="caption">{{pic.caption}}</p>
+                                </li>
+                            </ul>
+                            <div class="picNav">
+                                <span class="picCaption">{{pics[currentPic].caption}}</span>
+                                <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
+                            </div>
+                            <div class="slideControllers">
+                                <span class="slideController prev"></span>
+                                <span class="slideController next"></span>
                             </div>
                         </div>
                         <div id="MpieceContent" ms-html="content"></div>
