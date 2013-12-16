@@ -436,8 +436,9 @@ a.piece{
          -o-transition: all .5s;
             transition: all .5s;
         #diagramContainer{
-            height: auto;
-            padding-bottom: 100px;
+            height: 100%;
+            box-sizing: border-box;
+            border-bottom: 60px #ededef solid;
             overflow-y: visible;
             overflow-x: hidden;
         }
@@ -451,7 +452,6 @@ a.piece{
             width: auto;
             #pieces{
                 position: relative;
-                height: auto !important;
                 margin-top: 0;
             }
         }
@@ -715,9 +715,12 @@ a.piece{
             width: 100%;
             height: 350px;
             position: relative;
+            margin-top: 10px;
             #JpiecePicsSlider{
                 width : 100%;
                 height: 100%;
+                margin : 0;
+                padding: 0;
                 .piecePic{
                     display: block;
                     height: 100%;
@@ -732,6 +735,7 @@ a.piece{
                         width: 620px;
                     }
                     &:first-child{
+                        opacity: 1;
                         z-index: 2;
                     }
                 }
@@ -743,6 +747,8 @@ a.piece{
                 left: 0px;
                 bottom: 0px;
                 width: 100%;
+                box-sizing:border-box;
+                padding-left:10px;
                 height: 40px;
                 z-index: 3;
                 line-height: 40px;

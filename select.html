@@ -10,7 +10,6 @@
     <script src="./lib/moment-with-langs.js"></script>
     <script src="./lib/page.js"></script>
     <script src="./lib/pen/pen.js"></script>
-    <script src="./lib/responsiveslides.js"></script>
     <script src="./lib/dropzone.js"></script>
     <link href="./css/main.css" type="text/css" rel="stylesheet"/>
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
@@ -71,17 +70,15 @@
                             </span>
                         </div>
                         <div id="MpiecePics" ms-if="pics.length!=0">
-                            <ul id="JpiecePicsSlider" class="rslides" ms-each-pic="pics" data-each-rendered="detailPieceRendered">
+                            <ul id="JpiecePicsSlider" class="rslides" ms-each-pic="pics" data-each-rendered="piecePicsRendered">
                                 <li class="piecePic">
                                     <img ms-src="'http://127.0.0.1:1337/image/medium/'+pic.id" alt="">
-                                    <p class="caption">{{pic.caption}}</p>
                                 </li>
                             </ul>
-                            <div class="picNav">
-                                <span class="picCaption">{{pics[currentPic].caption}}</span>
+                            <div class="picNav" ms-class='hide:pics.length<2'>
                                 <span class="picIndex">{{currentPic+1}}</span>/<span class="picTotal">{{pics.length}}</span>
                             </div>
-                            <div class="slideControllers">
+                            <div class="slideControllers" ms-class='hide:pics.length<2'>
                                 <span class="slideController prev"></span>
                                 <span class="slideController next"></span>
                             </div>

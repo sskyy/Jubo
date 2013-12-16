@@ -129,7 +129,8 @@ define([], function(  ) {
 
     var bindWheelEvent = (function(){
         var hasScroll = false,
-            mouseIn = false
+            mouseIn = false,
+            viewMode 
 
         var eventName = "mousewheel";
         try {
@@ -143,7 +144,7 @@ define([], function(  ) {
             scrollMaxWidth = 0
 
         document.addEventListener(eventName, function(e) {
-            if ( hasScroll && inDiagramArea(e) ) { // 只有滚动条出现时才进入此分支
+            if ( hasScroll && inDiagramArea(e) && viewMode == 'event') { // 只有滚动条出现时才进入此分支
                 //stop y scroll
                 e.preventDefault()
                 e.stopPropagation()
@@ -166,7 +167,8 @@ define([], function(  ) {
             }
         })
 
-        return function( args ){
+        return function( args, vMode ){
+            viewMode = vMode
             hasScroll = args.wContainer < args.wPieces ? true : false
             scrollMaxWidth = hasScroll ? args.wPieces - args.wContainer : 0
         }
@@ -178,9 +180,21 @@ define([], function(  ) {
     var renderDom = function( event, diagramArgs, viewMode ){
         var pieces = document.querySelectorAll(diagramArgs.pieceSelector),
             isShortcutModel = (viewMode!="event") ? true:false,
-            positionKey = isShortcutModel ? 'shortcut-position' : 'position'
+            positionKey = isShortcutModel ? 'shortcut-position' : 'position',
+            $pieces = $(diagramArgs.piecesSelector)
 
-        $(diagramArgs.piecesSelector).width(diagramArgs.wPieces)
+        $pieces.width(diagramArgs.wPieces)
+        if( !isShortcutModel ){
+            if( !$pieces.data("originHeight")){
+                $pieces.data("originHeight",$pieces.height())
+            }else{
+                $pieces.height( $pieces.data("originHeight"))
+            }
+        }else{
+            $pieces.height( _.reduce(pieces,function(memo,piece){
+                return memo + $(piece).outerHeight() + 10
+            },0))
+        }
         
         console.log("DEB: rendering DOM", pieces.length,diagramArgs.wPieces, positionKey)
         
@@ -242,7 +256,6 @@ define([], function(  ) {
                     }
                 })())
                 console.log("DEB: shortcut model")
-
             }
         }else{
             if( pieces.length !=0 && $(pieces[0]).data(positionKey)){
@@ -260,7 +273,7 @@ define([], function(  ) {
             })
         }
 
-        bindWheelEvent(diagramArgs)
+        bindWheelEvent(diagramArgs,viewMode)
 
         return pieces
     }
