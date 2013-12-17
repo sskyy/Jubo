@@ -18,10 +18,18 @@
     <div id="login" class="Mmodal"  ms-controller="login" ms-if="modalMode=='login'&&user.uid==0">
         <a class="close" ms-click="changeModal">X</a>
         <div class="header">登录/注册</div>
-        <div class="message" ms-class="show:message">{{message}}</div>
-        <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="inputUsername"></div>
-        <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="inputPassword" type="password" ms-keypress="keypress($event)"></div>
-        <div class="footer row"><a class="Mbtn" ms-click="login">登录</a></div>
+        <div ms-class="hide:loginMode!='register'">
+            <div class="message" ms-class="show:message">{{message}}</div>
+            <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="inputUsername"></div>
+            <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="inputPassword" type="password" ms-keypress="keypress($event)"></div>
+            <div class="footer row"><a class="Mbtn" ms-click="login">登录</a></div>
+        </div>
+        <div>
+            <div class="message" ms-class="show:RegMessage">{{RegMessage}}</div>
+            <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="inputUsername"></div>
+            <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="inputPassword" type="password" ms-keypress="keypress($event)"></div>
+            <div class="footer row"><a class="Mbtn" ms-click="login">登录</a></div>
+        </div>
     </div>
     <div id="Cleft">
         <div class="info">

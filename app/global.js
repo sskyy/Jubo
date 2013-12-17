@@ -1,6 +1,6 @@
 define([],function(){
     exports = {
-        systemMetricsName : ['关注','图片']
+        systemMetrics : {'图片':'pics.length'}
     }
 
     return exports

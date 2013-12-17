@@ -9,7 +9,8 @@ define([], function(  ) {
             hContainer : 550,
             hContainerbottom:10,
             diagramContainerSelector :"#diagramContainer",
-            diagramSelector : '#diagram',
+            //cause diagram width will change, so we use the width of Mevent
+            diagramSelector : '#Mevent',
             pieceSelector : '.piece',
             piecesSelector : "#pieces",
             bgSelector : '#diagramBg',
@@ -24,14 +25,14 @@ define([], function(  ) {
     var calDiagramArgs = function(event){
         var args = _.clone(defaults)
         args.lineOffset = defaults.hUnit/2
-        args.wContainer = document.querySelector( defaults.diagramSelector).clientWidth
+        args.wDiagram = document.querySelector( defaults.diagramSelector).clientWidth
         args.containerLines = parseInt((document.body.clientHeight-200)/defaults.hUnit)
-        args.containerGrid = parseInt( args.wContainer /defaults.wUnit)
+        args.containerGrid = parseInt( args.wDiagram /defaults.wUnit)
         args.pieces = event.pieces.$model
         args.metrics = event.metrics.$model
         args.cols = args.pieces.length > args.containerGrid ? args.pieces.length + 1 : args.containerGrid
         args.wPieces = args.pieces.length*args.wUnit
-        args.colOffset = ((args.wContainer- args.wPieces)/2 + args.wUnit/2)%args.wUnit
+        args.colOffset = ((args.wDiagram- args.wPieces)/2 + args.wUnit/2)%args.wUnit
 
         return args
     }
@@ -90,7 +91,7 @@ define([], function(  ) {
             if( _.isEmpty(args.metrics) ){
                 return 
             }
-            var canvasWidth = _.max([args.wPieces ,args.wContainer])
+            var canvasWidth = _.max([args.wPieces ,args.wDiagram])
 
             rendered && ctx.clearRect ( 0 , 0 , canvasWidth , args.hCanvas )
 
@@ -173,8 +174,10 @@ define([], function(  ) {
 
         return function( args, vMode ){
             viewMode = vMode
-            hasScroll = args.wContainer < args.wPieces ? true : false
-            scrollMaxWidth = hasScroll ? args.wPieces - args.wContainer : 0
+            hasScroll = args.wDiagram < args.wPieces ? true : false
+            scrollMaxWidth = hasScroll ? args.wPieces - args.wDiagram : 0
+            console.log("bind wheel Event",args.wDiagram,args.wPieces)
+
         }
 
     })()
@@ -231,6 +234,7 @@ define([], function(  ) {
                             position = $(piece).data(positionKey) || {}
 
                         position[metricName] = {
+                            left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2,
                             top : (metricTop - pieceMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                         }
                         // console.log("DEB: setting position for", positionKey,position)
@@ -253,7 +257,6 @@ define([], function(  ) {
                 _.each(pieces, (function( piece, i ){
                     return function( piece, i){
                         $(piece).data(positionKey, {
-                            left:0,
                             top: stack
                         })
                         stack += $(pieces[i]).outerHeight() + 10
@@ -272,7 +275,7 @@ define([], function(  ) {
             if( !isShortcutModel){
                 $(piece).css( _.extend({
                     left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2
-                },$(piece).data(positionKey)[event.currentMetric] ) || {top:10})
+                    },$(piece).data(positionKey)?$(piece).data(positionKey)[event.currentMetric]: {top:10}))
             }else{
                 $(piece).css( _.extend({
                     left : 0

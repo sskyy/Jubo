@@ -10,16 +10,17 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
     function standardAllFields( pieces, metrics ){
         var standardPieces = [],
             metrics = metrics || {}
+            systemMetricNames = _.keys(Global.systemMetrics)
             //not use for now
             // systemMetricNames = ['阅读']
         //get all metrics and set metric to right data structure
         if( _.isEmpty(metrics)){
             for( var i in pieces ){
                 _.each( pieces[i].metrics,function( metricVal, metricName){
-                    if( _.indexOf( Global.systemMetricsName, metricName)!=-1){
+                    if( _.indexOf( systemMetricNames, metricName)!=-1){
                         return 
                     }
-                    metricVal = parseFloat(metricVal)
+                    pieces[i].metrics[metricName] = metricVal = parseFloat(metricVal)
                     if( metrics[metricName] == undefined){
                         // console.log( "DEB: setting metric", metricArr[0], metricArr)
                         metrics[metricName] = {
@@ -35,11 +36,39 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                     }
                 })
 
-                //standard system metrics
-                
+                //standard each system metrics
+                _.each(Global.systemMetrics,function(field,name){
+                    pieces[i].metrics[name] = parseFloat( eval("pieces[i]."+field))
+
+                    if( !metrics[name] ){
+                        metrics[name] = {
+                            top:pieces[i].metrics[name],
+                            bottom:pieces[i].metrics[name]
+                        }
+                    }else{
+                        if( pieces[i].metrics[name] > metrics[name].top ){
+                            metrics[name].top = pieces[i].metrics[name]
+                        }else if( pieces[i].metrics[name] < metrics[name].bottom){
+                            metrics[name].bottom = pieces[i].metrics[name]
+                        }
+                    }
+                })
+
             }
         }
-        console.log("DEB: get metircs",metrics)
+
+        _.each(metrics,function(boundary,name){
+            console.log( "checking",name, boundary)
+            if( boundary.top == boundary.bottom &&boundary.bottom == 0 ){
+                console.log("delete top bottom both 0 metric,",name,boundary)
+                delete metrics[name]
+            }else{
+                if( metrics[name].bottom == metrics[name].top && metrics[name].top > 0){
+                    metrics[name].bottom = 0
+                }
+            }
+        })
+        console.log("DEB: get metrics",metrics)
 
         for( var i=0,length=pieces.length;i<length;i++){
             var piece = _.extend(_.pick(pieces[i],"title","id","content","metrics","cover"),{
@@ -55,19 +84,16 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                 piece.fromLast = moment.duration(pieces[i].time-pieces[i-1].time).humanize()
             }
 
-            for( j in metrics ){
-                if( pieces[i].metrics[j] === undefined){
-                    //fix bug for any metric only appear in one piece
-                    if( metrics[j].bottom== metrics[j].top){
-                        metrics[j].bottom = 0
-                    }
-                    pieces[i].metrics[j] = metrics[j].bottom
-                }else{
-                    pieces[i].metrics[j] = parseFloat(pieces[i].metrics[j])
+            //fix bug for any metric not appeared in every piece
+            _.each( metrics,function( boundary,name ){
+                if( piece.metrics[name] === undefined ){
+                    piece.metrics[name] = metrics[name].bottom
                 }
-            }
-            //deal with pieces short of metrics
+            })
+
             standardPieces.push(piece)
+            
+            //deal with system metrics            
         }
         console.log( "DEB: standard all fields", [standardPieces,metrics])
         return [metrics,standardPieces]

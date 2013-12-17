@@ -3,6 +3,7 @@ define(['./util'], function(util) {
         baseUrl = "http://127.0.0.1:1337/"
         connectAddr = baseUrl + "user/connect",
         loginAddr = baseUrl + "user/login",
+        regAddr = baseUrl + "user/register",
         logoutAddr = baseUrl + "user/logout",
         tokenAddr = baseUrl + "user/token"
 
@@ -17,13 +18,20 @@ define(['./util'], function(util) {
                     vm.inputUsername = ""
                     vm.inputPassword = ""
                     vm.message = ""
+                    vm.regMode = false
+                    vm.regUsername = ""
+                    vm.regPassword = ""
+                    vm.connecting = false
                     vm.login = function(){
+                        vm.connecting = true1
+
                         return $.ajax(loginAddr,{
                             type:"POST",
                             cache:false,
                             dataType:"json",
                             data:'username=' + encodeURIComponent(vm.inputUsername) + '&password=' + encodeURIComponent(vm.inputPassword),
                         }).done( function(data){
+                            vm.connecting = true
                             _.extend(general.user , data.user)
                             $.cookie(data.session_name,data.sessid)
                             vm.message=""
@@ -31,6 +39,7 @@ define(['./util'], function(util) {
                             console.log("SUS: Login success",data.user.name)
                         }).fail(function( res,status, msg ){
                             console.log( "SUS: Login failed")
+                            vm.connecting = true
                             if( res.status == 401){
                                 vm.message = "用户名或密码错误"
                             }else{
@@ -40,8 +49,27 @@ define(['./util'], function(util) {
                     }
                     vm.keypress = function($e){
                         if( $e.which == 13){
-                            vm.login()
+                            if( !vm.regMode){
+                                vm.login()
+                            }else{
+                                vm.register()
+                            }
                         }
+                    }
+                    vm.register = function(){
+                        vm.connecting = true
+                        return util.api({
+                            url:regAddr,
+                            type:"POST",
+                            dataType: 'json'
+                        }).done( function(data){
+                            vm.connecting = true
+                            general.user.reset()
+                            console.log("SUS: Bye!")
+                        }).fail(function(){
+                            vm.connecting = true
+                            console.log("ERR: 退出失败")
+                        })
                     }
                     vm.logout = function(){
                         return util.api({
