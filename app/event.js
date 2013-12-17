@@ -1,4 +1,4 @@
-define(['./diagram','./piece','./util'], function(Diagram,Piece,util) {
+define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,Global) {
     var exports = {},
         detailPiece = Piece.vmodel(),
         baseUrl = "http://127.0.0.1:1337/",
@@ -16,6 +16,9 @@ define(['./diagram','./piece','./util'], function(Diagram,Piece,util) {
         if( _.isEmpty(metrics)){
             for( var i in pieces ){
                 _.each( pieces[i].metrics,function( metricVal, metricName){
+                    if( _.indexOf( Global.systemMetricsName, metricName)!=-1){
+                        return 
+                    }
                     metricVal = parseFloat(metricVal)
                     if( metrics[metricName] == undefined){
                         // console.log( "DEB: setting metric", metricArr[0], metricArr)
@@ -31,6 +34,8 @@ define(['./diagram','./piece','./util'], function(Diagram,Piece,util) {
                         }
                     }
                 })
+
+                //standard system metrics
                 
             }
         }
@@ -96,7 +101,7 @@ define(['./diagram','./piece','./util'], function(Diagram,Piece,util) {
                             vm.loading = true
                             vm.choosing = false
                             console.log( "DEB: ", refresh? "refresh event" : "load new event" , id)
-                            util.api({
+                            Util.api({
                                 url:eventAddr + id,
                             }).done( function( event){
                                 console.log('DEB: get event',event)
@@ -161,7 +166,7 @@ define(['./diagram','./piece','./util'], function(Diagram,Piece,util) {
                     }
                     vm.loadMyEvents = function(){
                         vm.choosing = true
-                        util.api({
+                        Util.api({
                             url : myEventsAddr,
                         }).done(function(data){
                             vm.myEvents = data

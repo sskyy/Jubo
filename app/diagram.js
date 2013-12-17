@@ -27,8 +27,8 @@ define([], function(  ) {
         args.wContainer = document.querySelector( defaults.diagramSelector).clientWidth
         args.containerLines = parseInt((document.body.clientHeight-200)/defaults.hUnit)
         args.containerGrid = parseInt( args.wContainer /defaults.wUnit)
-        args.pieces = event.pieces
-        args.metrics = event.metrics
+        args.pieces = event.pieces.$model
+        args.metrics = event.metrics.$model
         args.cols = args.pieces.length > args.containerGrid ? args.pieces.length + 1 : args.containerGrid
         args.wPieces = args.pieces.length*args.wUnit
         args.colOffset = ((args.wContainer- args.wPieces)/2 + args.wUnit/2)%args.wUnit
@@ -87,6 +87,9 @@ define([], function(  ) {
         }
 
         return function( args ){
+            if( _.isEmpty(args.metrics) ){
+                return 
+            }
             var canvasWidth = _.max([args.wPieces ,args.wContainer])
 
             rendered && ctx.clearRect ( 0 , 0 , canvasWidth , args.hCanvas )
@@ -146,6 +149,7 @@ define([], function(  ) {
         document.addEventListener(eventName, function(e) {
             if ( hasScroll && inDiagramArea(e) && viewMode == 'event') { // 只有滚动条出现时才进入此分支
                 //stop y scroll
+                console.log("we take over scroll",hasScroll,inDiagramArea(e),viewMode)
                 e.preventDefault()
                 e.stopPropagation()
                 if (eventName == "DOMMouseScroll") {
@@ -198,6 +202,7 @@ define([], function(  ) {
         
         console.log("DEB: rendering DOM", pieces.length,diagramArgs.wPieces, positionKey)
         
+        //caculate positions
         if( pieces.length > 1 && !$(pieces[0]).data(positionKey)){
             diagramArgs.piecesPos = []
             if( !isShortcutModel ){
@@ -226,7 +231,6 @@ define([], function(  ) {
                             position = $(piece).data(positionKey) || {}
 
                         position[metricName] = {
-                            left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2,
                             top : (metricTop - pieceMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                         }
                         // console.log("DEB: setting position for", positionKey,position)
@@ -263,15 +267,18 @@ define([], function(  ) {
             }
         }
 
-        if(event.currentMetric){
-            _.each(pieces, function( piece){
-                if( !isShortcutModel){
-                    $(piece).css( $(piece).data(positionKey)[event.currentMetric] )
-                }else{
-                    $(piece).css( $(piece).data(positionKey) )
-                }
-            })
-        }
+        //imply positions
+        _.each(pieces, function( piece,j){
+            if( !isShortcutModel){
+                $(piece).css( _.extend({
+                    left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2
+                },$(piece).data(positionKey)[event.currentMetric] ) || {top:10})
+            }else{
+                $(piece).css( _.extend({
+                    left : 0
+                },$(piece).data(positionKey) ))
+            }
+        })
 
         bindWheelEvent(diagramArgs,viewMode)
 
@@ -289,7 +296,7 @@ define([], function(  ) {
 
         return function(event, diagramArgs, viewMode, diagramRendered){
 
-            if( viewMode != 'event'){
+            if( viewMode != 'event' || _.isEmpty(diagramArgs.metrics)){
                 return
             }
             function setOpt(ele, opt){
