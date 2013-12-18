@@ -15,12 +15,14 @@ define(['./util'], function(util) {
             if( !loginVm ){
 
                 loginVm = avalon.define("login",function(vm){
-                    vm.inputUsername = ""
-                    vm.inputPassword = ""
+                    vm.username = ""
+                    vm.password = ""
                     vm.message = ""
                     vm.regMode = false
                     vm.regUsername = ""
                     vm.regPassword = ""
+                    vm.regEmail = ""
+                    vm.regMessage = ""
                     vm.connecting = false
                     vm.login = function(){
                         vm.connecting = true1
@@ -29,11 +31,14 @@ define(['./util'], function(util) {
                             type:"POST",
                             cache:false,
                             dataType:"json",
-                            data:'username=' + encodeURIComponent(vm.inputUsername) + '&password=' + encodeURIComponent(vm.inputPassword),
-                        }).done( function(data){
+                            data:{
+                                username:vm.username,
+                                password:vm.password
+                            }
+                        }).done( function( user ){
                             vm.connecting = true
-                            _.extend(general.user , data.user)
-                            $.cookie(data.session_name,data.sessid)
+                            _.extend(general.user , user)
+                            // $.cookie(data.session_name,data.sessid)
                             vm.message=""
                             general.changeModal()
                             console.log("SUS: Login success",data.user.name)
@@ -62,9 +67,16 @@ define(['./util'], function(util) {
                             url:regAddr,
                             type:"POST",
                             dataType: 'json'
-                        }).done( function(data){
-                            vm.connecting = true
-                            general.user.reset()
+                            data:{
+                                username :vm.regUsername,
+                                password : vm.regPassword,
+                                email : vm.regEmail
+                            }
+                        }).done( function(user){
+                            _.extend(general.user , user)
+                            // $.cookie(data.session_name,data.sessid)
+                            vm.message=""
+                            general.changeModal()
                             console.log("SUS: Bye!")
                         }).fail(function(){
                             vm.connecting = true
