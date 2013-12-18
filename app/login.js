@@ -5,7 +5,7 @@ define(['./util'], function(util) {
         loginAddr = baseUrl + "user/login",
         regAddr = baseUrl + "user/register",
         logoutAddr = baseUrl + "user/logout",
-        tokenAddr = baseUrl + "user/token"
+        tokenAddr = baseUrl + "csrfToken"
 
 
     exports.vmodel = (function(){
@@ -15,24 +15,24 @@ define(['./util'], function(util) {
             if( !loginVm ){
 
                 loginVm = avalon.define("login",function(vm){
-                    vm.username = ""
+                    vm.name = ""
                     vm.password = ""
                     vm.message = ""
                     vm.regMode = false
-                    vm.regUsername = ""
+                    vm.regName = ""
                     vm.regPassword = ""
                     vm.regEmail = ""
                     vm.regMessage = ""
                     vm.connecting = false
                     vm.login = function(){
-                        vm.connecting = true1
+                        vm.connecting = true
 
-                        return $.ajax(loginAddr,{
+                        return util.api({
+                            url : loginAddr,
                             type:"POST",
-                            cache:false,
                             dataType:"json",
                             data:{
-                                username:vm.username,
+                                name:vm.name,
                                 password:vm.password
                             }
                         }).done( function( user ){
@@ -41,7 +41,7 @@ define(['./util'], function(util) {
                             // $.cookie(data.session_name,data.sessid)
                             vm.message=""
                             general.changeModal()
-                            console.log("SUS: Login success",data.user.name)
+                            console.log("SUS: Login success",user.name)
                         }).fail(function( res,status, msg ){
                             console.log( "SUS: Login failed")
                             vm.connecting = true
@@ -66,9 +66,9 @@ define(['./util'], function(util) {
                         return util.api({
                             url:regAddr,
                             type:"POST",
-                            dataType: 'json'
+                            dataType: 'json',
                             data:{
-                                username :vm.regUsername,
+                                name :vm.regName,
                                 password : vm.regPassword,
                                 email : vm.regEmail
                             }
@@ -77,10 +77,11 @@ define(['./util'], function(util) {
                             // $.cookie(data.session_name,data.sessid)
                             vm.message=""
                             general.changeModal()
-                            console.log("SUS: Bye!")
+                            console.log("SUS: register success",user)
                         }).fail(function(){
                             vm.connecting = true
-                            console.log("ERR: 退出失败")
+                            vm.regMessage = "注册失败"
+                            console.log("ERR: register failed")
                         })
                     }
                     vm.logout = function(){
@@ -102,20 +103,60 @@ define(['./util'], function(util) {
                             dataType:'json',
                         })
                     }
+                    vm.changeRegMode = function( regMode ){
+                        vm.regMode = regMode || false
+                    }
                 })   
 
                 // init user
                 console.log("DEB: checking current user")
-                loginVm.whoami().done(function( user ){
-                    if( user.id != 0){
-                        _.extend(general.user , user)
-                        console.log("DEB: Hello ", user.name)
-                    }else{
-                        console.log("DEB: current user not login")
-                    }
-                }).fail(function(data){
-                    console.log("ERR: whoami failed", data)
-                })
+                // loginVm.whoami().done(function( user ){
+                //     if( user.id != 0){
+                //         _.extend(general.user , user)
+                //         console.log("DEB: Hello ", user.name)
+                //     }else{
+                //         console.log("DEB: current user not login")
+                //     }
+                // }).fail(function(data){
+                //     console.log("ERR: whoami failed", data)
+                // })
+
+                //test for register
+                // loginVm.regName = "root"
+                // loginVm.regPassword = "rootroot"
+                // loginVm.regEmail = "root@root.com"
+                // loginVm.register()
+
+                //test for login
+                // loginVm.name = "root"
+                // loginVm.password = "rootroot"
+                // loginVm.login().done(function(){
+                //     loginVm.whoami().done(function( user ){
+                //         if( user.id != 0){
+                //             _.extend(general.user , user)
+                //             console.log("DEB: Hello ", user.name)
+                //         }else{
+                //             console.log("DEB: current user not login")
+                //         }
+                //     }).fail(function(data){
+                //         console.log("ERR: whoami failed", data)
+                //     })
+                // })
+                
+                //test for logout
+                // loginVm.logout().done(function(){
+                //     loginVm.whoami().done(function( user ){
+                //         if( user.id != 0){
+                //             _.extend(general.user , user)
+                //             console.log("DEB: Hello ", user.name)
+                //         }else{
+                //             console.log("DEB: current user not login")
+                //         }
+                //     }).fail(function(data){
+                //         console.log("ERR: whoami failed", data)
+                //     })
+                // })
+
             }
 
             return loginVm
