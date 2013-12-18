@@ -5,6 +5,7 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
         eventAddr = baseUrl+"event/eventWithPieces/",
         // myEventsAddr = baseUrl+"me/event",
         myEventsAddr = baseUrl+"event/",
+        eventDeleteAddr = baseUrl + "event/delete/"
         piecesAddr = baseUrl+"piece/piecesById"
 
     function standardAllFields( pieces, metrics ){
@@ -112,9 +113,11 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                     vm.currentMetric = null
                     vm.currentPiece = null
                     vm.id = null
+                    vm.uid = null
                     vm.myEvents = []
                     vm.choosing = false
                     vm.loading = false
+                    vm.isAuthor = false
                     vm.active = function(piece){
                         vm.currentPiece = piece
                     }
@@ -136,6 +139,7 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                                 if( event.pieces.length == 0 ){
                                     Diagram.render( eventVm, general )
                                 }
+                                vm.isAuthor = (general.user.id == eventVm.uid)
                                 vm.loading = false
                                 defer.resolve()
                             }).fail(function(){
@@ -203,9 +207,26 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                     vm.getPieceId = function(){
                         return detailPiece.id;
                     }
+                    vm.deleteEvent = function(){
+                        if( confirm("确定删除事件？所有的片段也会被删除。")){
+                            Util.api({
+                                url : eventDeleteAddr + vm.id,
+                                type : "delete",
+                            }).done(function(){
+                                page("/")
+                            })
+                        }
+                    }
+                })
+                //add in
+                general.user.$watch("id",function(id){
+                    if( id != 0 ){
+                        eventVm.isAuthor = (id == eventVm.uid)
+                    }
                 })
                 return eventVm
             }
+
         }
     })()
 

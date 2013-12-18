@@ -35,7 +35,7 @@ define(['./util'], function(util) {
                                 name:vm.name,
                                 password:vm.password
                             }
-                        }).done( function( user ){
+                        },true).done( function( user ){
                             vm.connecting = true
                             _.extend(general.user , user)
                             // $.cookie(data.session_name,data.sessid)
@@ -66,17 +66,14 @@ define(['./util'], function(util) {
                         return util.api({
                             url:regAddr,
                             type:"POST",
-                            dataType: 'json',
                             data:{
                                 name :vm.regName,
                                 password : vm.regPassword,
                                 email : vm.regEmail
                             }
-                        }).done( function(user){
-                            _.extend(general.user , user)
-                            // $.cookie(data.session_name,data.sessid)
-                            vm.message=""
+                        }).done( function(){
                             general.changeModal()
+                            vm.whoami()
                             console.log("SUS: register success",user)
                         }).fail(function(){
                             vm.connecting = true
@@ -87,8 +84,7 @@ define(['./util'], function(util) {
                     vm.logout = function(){
                         return util.api({
                             url:logoutAddr,
-                            type:"POST",
-                            dataType: 'json'
+                            type:"POST"
                         }).done( function(data){
                             general.user.reset()
                             console.log("SUS: Bye!")
@@ -105,21 +101,22 @@ define(['./util'], function(util) {
                     }
                     vm.changeRegMode = function( regMode ){
                         vm.regMode = regMode || false
+                        console.log( "regMode",regMode )
                     }
                 })   
 
                 // init user
                 console.log("DEB: checking current user")
-                // loginVm.whoami().done(function( user ){
-                //     if( user.id != 0){
-                //         _.extend(general.user , user)
-                //         console.log("DEB: Hello ", user.name)
-                //     }else{
-                //         console.log("DEB: current user not login")
-                //     }
-                // }).fail(function(data){
-                //     console.log("ERR: whoami failed", data)
-                // })
+                loginVm.whoami().done(function( user ){
+                    if( user.id != 0){
+                        _.extend(general.user , user)
+                        console.log("DEB: Hello ", user.name)
+                    }else{
+                        console.log("DEB: current user not login")
+                    }
+                }).fail(function(data){
+                    console.log("ERR: whoami failed", data)
+                })
 
                 //test for register
                 // loginVm.regName = "root"

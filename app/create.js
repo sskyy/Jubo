@@ -8,6 +8,7 @@ define(['./util'], function(util) {
         albumPreivewSelector = "#newPieceAlbumPreview",
         pieceCoverClass= "pieceCover",
         eventAddr = baseUrl+"event",
+        eventCreateAddr = baseUrl+"event/create",
         pieceAddr = baseUrl+"piece",
         imageAddr = baseUrl + "image",
         addRelationAddr = "http://127.0.0.1:8080/drupal/api/relation.json",
@@ -198,7 +199,7 @@ define(['./util'], function(util) {
                         if( vm.connecting) return 
                         vm.connecting = true
                         util.api({
-                            url:eventAddr,
+                            url:eventCreateAddr,
                             type:"POST",
                             data:{
                                 title:vm.newEventTitle,

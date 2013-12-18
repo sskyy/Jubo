@@ -60,8 +60,9 @@ define([], function() {
     exports.api = (function(){
 
 
-        return function( opt ){
+        return function( opt,refreshToken ){
             var defer = $.Deferred()
+                refreshToken = refreshToken || false
 
             function wrapOpt( opt ){
                 if( !opt.type || /post/i.test(!opt.type)){
@@ -78,7 +79,7 @@ define([], function() {
                 })
             }
 
-            if( token ){
+            if( token && !refreshToken){
                 opt= wrapOpt(opt)
                 //TODO 增加token过期处理
                 defer = $.ajax( opt)

@@ -9,7 +9,7 @@ define(['./util'], function(util) {
                 listVm = avalon.define("events",function(vm){
                     vm.events =[]
                     vm.get = function(){
-                        util.api({
+                        return util.api({
                             url:listAddr,
                         }).done(function(data){
                             vm.events = data

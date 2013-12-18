@@ -13,36 +13,44 @@
     <script src="./lib/dropzone.js"></script>
     <link href="./css/main.css" type="text/css" rel="stylesheet"/>
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
+    <style>
+    [ms-controller]{
+        display: none;
+    }
+    </style>
 </head>
 <body ms-controller="general">
-    <div id="login" class="Mmodal"  ms-controller="login" ms-if="modalMode=='login'&&user.uid==0">
+    <div id="login" class="Mmodal"  ms-controller="login" ms-if="modalMode=='login'&&user.id==0">
         <a class="close" ms-click="changeModal">X</a>
         <div class="header">登录/注册</div>
         <div class="body" ms-class="hide:regMode">
             <div class="message" ms-class="show:message">{{message}}</div>
             <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="name"></div>
             <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="password" type="password" ms-keypress="keypress($event)"></div>
-            <div class="footer row">
+            <div class="footer row clearfix">
                 <a class="Mbtn left" ms-click="login">登录</a>
-                <a ms-click='changeRegMode(true)'>注册</a>
+                <a class="right" ms-click='changeRegMode(true)'>注册</a>
             </div>
         </div>
         <div class="body" ms-class="hide:!regMode">
             <div class="message" ms-class="show:RegMessage">{{regMessage}}</div>
             <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="regName"></div>
-            <div class="row"><span class="MinputLabel">邮箱</span><input class="inputTypical" type="text" ms-duplex="regName"></div>
+            <div class="row"><span class="MinputLabel">邮箱</span><input class="inputTypical" type="text" ms-duplex="regEmail"></div>
             <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="regPassword" type="password" ms-keypress="keypress($event)"></div>
-            <div class="footer row">
-                <a class="left" ms-click='changeRegMode'>登录</a>
-                <a class="Mbtn" ms-click="register">注册</a>
+            <div class="footer row clearfix">
+                <a class="left" ms-click='changeRegMode(false)'>登录</a>
+                <a class="Mbtn right" ms-click="register">注册</a>
             </div>
         </div>
     </div>
     <div id="Cleft">
+        <div id="logo" style="text-align:center">
+            <img src="/public/logo-white.png">
+        </div>
         <div class="info">
-            <a ms-if="!user.uid" ms-click="changeModal('login')">登录</a>
-            <span ms-if="user.uid" class="username">{{user.name}}</span>
-            <a ms-if="user.uid" ms-click="logout">退出</a>
+            <a ms-if="!user.id" ms-click="changeModal('login')">登录/注册</a>
+            <span ms-if="user.id" class="username">{{user.name}}</span>
+            <a ms-if="user.id" ms-click="logout">退出</a>
 
         </div>
         <div class="navs">
@@ -135,7 +143,10 @@
                 <div class="MeventBrief" ms-if="!choosing">
                     <a class="title" ms-href="/event/{{id}}">{{title}}</a>
                     <div class="intro">{{content}}</div>
+                    <a class="delete" ms-if="isAuthor" ms-click="deleteEvent">删除</a>
                 </div>
+
+                <div id="MeventTutorial" ms-if="viewMode=='event'&&pieces.length==0" ><a href="/create/piece">创建第一个片段</a></div>
 
                 <a class="eventChange" ms-if="!choosing&&id!=null&&viewMode=='newEvent'" ms-click="loadMyEvents">选择其他事件</a>
                 <div class="eventChange" ms-if="choosing">选择一个事件</div>
@@ -202,6 +213,10 @@
             </div>
         </div>
     </div>
+
+<!--     <div id="landing" ms-class="hide:!landing">
+
+    </div> -->
 
     <script src="./lib/avalon.js"></script>
     <script>

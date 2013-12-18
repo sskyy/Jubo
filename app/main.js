@@ -7,13 +7,14 @@ define(['./event','./create','./login','./list','./util'], function( Event, Crea
     var generalVm = avalon.define('general',function(vm){
         vm.viewMode = "view"
         vm.modalMode = ""
+        vm.landing = true
         vm.user = {
-            uid:0,
+            id:0,
             name:"",
             reset : function( user){
                 console.log("DEB: reset user")
                 if( !user){
-                    generalVm.user.uid=0
+                    generalVm.user.id=0
                     generalVm.user.name=""
                 }
                 console.log("DEB: reset user")
@@ -56,7 +57,9 @@ define(['./event','./create','./login','./list','./util'], function( Event, Crea
         //页面的改变都由路径控制。
         page("/event/list",function(){
             generalVm.changeView("all")
-            listVm.get()
+            listVm.get().done(function(){
+                generalVm.landing = false
+            })
         })
 
         page("/event/:eid",function( ctx, next ){
@@ -83,9 +86,9 @@ define(['./event','./create','./login','./list','./util'], function( Event, Crea
             eventVm.showPiece( ctx.params.eid, ctx.params.pid )
         })
 
-
         page("*",function(){
             console.log("ERR: SOMETHING WRONG WITH ROUTER!!! * TAKE CHARGE NOW!!!")
+            page("/event/list")
         })
 
         page()

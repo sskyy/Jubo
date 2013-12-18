@@ -88,16 +88,16 @@ define([], function(  ) {
         }
 
         return function( args ){
-            if( _.isEmpty(args.metrics) ){
-                return 
-            }
             var canvasWidth = _.max([args.wPieces ,args.wDiagram])
-
-            rendered && ctx.clearRect ( 0 , 0 , canvasWidth , args.hCanvas )
-
             canvas.width = canvasWidth
             canvas.height = args.hCanvas
-            
+
+            if( _.isEmpty(args.metrics) || rendered){
+                console.log("DEB: clear background!")
+                ctx.clearRect ( 0 , 0 , canvasWidth , args.hCanvas )
+                return 
+            }
+
             renderMatrix( args.wUnit, 
                 args.hUnit, 
                 args.cols, 
@@ -299,7 +299,7 @@ define([], function(  ) {
 
         return function(event, diagramArgs, viewMode, diagramRendered){
 
-            if( viewMode != 'event' || _.isEmpty(diagramArgs.metrics)){
+            if( viewMode != 'event' ){
                 return
             }
             function setOpt(ele, opt){
@@ -354,13 +354,13 @@ define([], function(  ) {
                 })
             }
 
+            svg = svg || Snap( diagramArgs.svgSelector)
+
             if( arguments.length == 1 ){
                 //if we only want to set current path
                 console.log("DEB: only set current metric for svg")
                 return setCurrentPath( arguments[0] )
             }else{
-                svg = svg || Snap( diagramArgs.svgSelector)
-            
                 if( rendered ){
                     console.log("DEB: svg second rendering")
                     if( lastId == event.id && lastPieceLength == event.pieces.length){
