@@ -1,4 +1,4 @@
-define(['./event','./create','./login','./list','./util'], function( Event, Create,Login,List,util ) {
+define(['./event','./create','./login','./list','./util','./global'], function( Event, Create,Login,List,util,Global ) {
     moment.lang('zh-cn')
     util.patch()
 
@@ -8,6 +8,7 @@ define(['./event','./create','./login','./list','./util'], function( Event, Crea
         vm.viewMode = "view"
         vm.modalMode = ""
         vm.landing = true
+        vm.baseUrl = Global.baseUrl
         vm.user = {
             id:0,
             name:"",

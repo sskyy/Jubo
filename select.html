@@ -95,7 +95,7 @@
                         <div id="MpiecePics" ms-if="pics.length!=0">
                             <ul id="JpiecePicsSlider" class="rslides" ms-each-pic="pics" data-each-rendered="piecePicsRendered">
                                 <li class="piecePic">
-                                    <img ms-src="'http://127.0.0.1:1337/image/medium/'+pic.id" alt="">
+                                    <img ms-src="baseUrl+'image/medium/'+pic.id" alt="">
                                 </li>
                             </ul>
                             <div class="picNav" ms-class='hide:pics.length<2'>
@@ -178,7 +178,7 @@
                         <div id="pieces">
                             <div ms-each-piece="pieces"  data-each-rendered="pieceRendered">
                                 <a ms-attr-id="'piece'+($index+1)" ms-data-piece="piece" class="piece" ms-mouseenter="active(piece)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/piece/'+piece.id">
-                                    <div class="cover" ms-if="piece.cover" ><img ms-src="'http://127.0.0.1:1337/image/thumb/'+piece.cover"/></div>
+                                    <div class="cover" ms-if="piece.cover" ><img ms-src="baseUrl+'image/thumb/'+piece.cover"/></div>
                                     <div class="title">{{piece.title}}</div>
                                     <div class="text">{{piece.content|stripHTML|truncate(140,"...")}}</div>
                                     <div class="more">!</div>
