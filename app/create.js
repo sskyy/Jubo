@@ -1,6 +1,6 @@
-define(['./util'], function(util) {
+define(['./util','./global'], function(Util,Global) {
     var exports = {},
-        baseUrl = "http://127.0.0.1:1337/",
+        baseUrl = Global.baseUrl,
         pieceContentSelector="#newPieceContent",
         pieceMenuSelector = "#newPieceMenu",
         previewSelector = "#newPiecePreview",
@@ -48,7 +48,7 @@ define(['./util'], function(util) {
                 });
                 uploader.on("removedfile",function(file){
                     console.log("remove file", file)
-                    util.api({
+                    Util.api({
                         url : imageAddr + "/" +file.id,
                         type : "delete"
                     })
@@ -74,7 +74,7 @@ define(['./util'], function(util) {
                     file.previewElement.appendChild(removeButton);
 
                 })
-                util.getCsrfToken().done( function(token ){
+                Util.getCsrfToken().done( function(token ){
                     uploader.on("sending", function(file, xhr) { xhr.setRequestHeader("X-CSRF-Token", token); });
                 })
             }
@@ -123,7 +123,7 @@ define(['./util'], function(util) {
                             alert("请选择你要将此片段插入的事件")
                             return 
                         }
-                        util.api({
+                        Util.api({
                             url : pieceAddr,
                             type:"POST",
                             data:{
@@ -198,7 +198,7 @@ define(['./util'], function(util) {
                     vm.publish= function(){
                         if( vm.connecting) return 
                         vm.connecting = true
-                        util.api({
+                        Util.api({
                             url:eventCreateAddr,
                             type:"POST",
                             data:{

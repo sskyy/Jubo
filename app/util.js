@@ -1,6 +1,7 @@
-define([], function() {
+define(['./global'], function(Global) {
     var exports = {},
-        tokenAddr = "http://127.0.0.1:1337/csrfToken",
+        baseUrl = Global.baseUrl,
+        tokenAddr = baseUrl + "csrfToken",
         token
 
 

@@ -1,6 +1,6 @@
-define(['./util'], function(util) {
+define(['./util','./global'], function(Util,Global) {
     var exports = {},
-        baseUrl = "http://127.0.0.1:1337/"
+        baseUrl = Global.baseUrl,
         connectAddr = baseUrl + "user/connect",
         loginAddr = baseUrl + "user/login",
         regAddr = baseUrl + "user/register",
@@ -27,7 +27,7 @@ define(['./util'], function(util) {
                     vm.login = function(){
                         vm.connecting = true
 
-                        return util.api({
+                        return Util.api({
                             url : loginAddr,
                             type:"POST",
                             dataType:"json",
@@ -63,7 +63,7 @@ define(['./util'], function(util) {
                     }
                     vm.register = function(){
                         vm.connecting = true
-                        return util.api({
+                        return Util.api({
                             url:regAddr,
                             type:"POST",
                             data:{
@@ -82,7 +82,7 @@ define(['./util'], function(util) {
                         })
                     }
                     vm.logout = function(){
-                        return util.api({
+                        return Util.api({
                             url:logoutAddr,
                             type:"POST"
                         }).done( function(data){
@@ -93,7 +93,7 @@ define(['./util'], function(util) {
                         })
                     }
                     vm.whoami = function(){
-                        return util.api({
+                        return Util.api({
                             type:"POST",
                             url : connectAddr,
                             dataType:'json',

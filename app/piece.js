@@ -1,6 +1,7 @@
-define(['./util'], function(util) {
+define(['./util','./global'], function(Util,Global) {
     var exports = {},
-        pieceAddr = "http://127.0.0.1:1337/piece/pieceWithPics/",
+        baseUrl = Global.baseUrl,
+        pieceAddr = baseUrl + "piece/pieceWithPics/",
         sliderPrevSelector = ".slideController.prev",
         sliderNextSelector = ".slideController.next",
         sliderContainerSelector = "#MpiecePics",
@@ -130,7 +131,7 @@ define(['./util'], function(util) {
                     }
                     vm.load = function( id ){
                         vm.loading = true
-                        return util.api({
+                        return Util.api({
                             url:pieceAddr + id
                         }).done(function( piece){
                             console.log("DEB: load piece", piece)

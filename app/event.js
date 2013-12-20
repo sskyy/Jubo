@@ -1,7 +1,7 @@
 define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,Global) {
     var exports = {},
         detailPiece = Piece.vmodel(),
-        baseUrl = "http://127.0.0.1:1337/",
+        baseUrl = Global.baseUrl,
         eventAddr = baseUrl+"event/eventWithPieces/",
         // myEventsAddr = baseUrl+"me/event",
         myEventsAddr = baseUrl+"event/",

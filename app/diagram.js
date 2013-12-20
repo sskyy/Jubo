@@ -1,4 +1,4 @@
-define([], function(  ) {
+define([], function() {
     var exports = {};
  
     var defaults = {

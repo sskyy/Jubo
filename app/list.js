@@ -1,6 +1,7 @@
-define(['./util'], function(util) {
+define(['./util','./global'], function(util,Global) {
     var exports = {},
-        listAddr = "http://127.0.0.1:1337/event"
+        baseUrl = Global.baseUrl,
+        listAddr = baseUrl + "event"
 
     exports.vmodel = (function(){
         var listVm
