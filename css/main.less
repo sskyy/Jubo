@@ -5,10 +5,11 @@
 
 //colors
 @metricColor1:#9AC600;
-@metricColor2:#18b6b9;
-@metricColor3:#d6d2a2;
-@metricColor4:#b7dad3;
-@metricColor5:#e8ab79;
+@metricColor2:#cc8a87;
+@metricColor3:#33655a;
+@metricColor4:#d3b942;
+@metricColor5:#b7dad3;
+@metricColor6:#9966cc;
 
 //===========global settings
 ::-webkit-scrollbar {
@@ -111,6 +112,7 @@ i.fa{
     display: none;
 }
 
+
 .Mpage{
     display: none;
     position: absolute;
@@ -125,6 +127,7 @@ i.fa{
         display: block;
     }
     .MpageMessage{
+        font-family: 'lucida grande', 'lucida sans unicode', lucida, 'Helvetica Neue', helvetica, 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
         position: absolute;
         top: 50%;
         width : 100%;
@@ -205,6 +208,9 @@ input[type="text"],input[type="password"]{
             &.Mbtn{
                 color:#fff;
                 padding: 0 12px;
+            }
+            i{
+                margin-left: 4px;
             }
         }
     }
@@ -658,6 +664,12 @@ a.piece{
                 border-bottom: 4px @metricColor5 solid;
                 &.current{
                     background: @metricColor5;
+                }
+            }
+            &:nth-child(6){
+                border-bottom: 4px @metricColor6 solid;
+                &.current{
+                    background: @metricColor6;
                 }
             }
         }

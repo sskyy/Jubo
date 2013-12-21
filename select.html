@@ -30,7 +30,7 @@
             <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="password" type="password" ms-keypress="keypress($event)"></div>
             <div class="footer row clearfix">
                 <a class="Mbtn left" ms-click="login">登录</a>
-                <a class="right" ms-click='changeRegMode(true)'>注册</a>
+                <a class="right" ms-click='changeRegMode(true)'>注册<i class="fa fa-long-arrow-right"></i></a>
             </div>
         </div>
         <div class="body" ms-class="hide:!regMode">
@@ -39,7 +39,7 @@
             <div class="row"><span class="MinputLabel">邮箱</span><input class="inputTypical" type="text" ms-duplex="regEmail"></div>
             <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="regPassword" type="password" ms-keypress="keypress($event)"></div>
             <div class="footer row clearfix">
-                <a class="left" ms-click='changeRegMode(false)'>登录</a>
+                <a class="left" ms-click='changeRegMode(false)'><i class="fa fa-long-arrow-left"></i>登录</a>
                 <a class="Mbtn right" ms-click="register">注册</a>
             </div>
         </div>
@@ -148,7 +148,10 @@
                     <a class="delete" ms-if="isAuthor" ms-click="deleteEvent">删除</a>
                 </div>
 
-                <div id="MeventTutorial" ms-if="viewMode=='event'&&pieces.length==0" ><i class="fa fa-plus-square"></i><a href="/create/piece">创建第一个片段</a></div>
+                <div id="MeventTutorial" ms-if="viewMode=='event'&&pieces.length==0" >
+                    <div ms-if="isAuthor"><i class="fa fa-plus-square"></i><a href="/create/piece">创建第一个片段</a></div>
+                    <div ms-if="!isAuthor" class="MpageMessage">作者还没有创建片段</div>
+                </div>
 
                 <a class="eventChange" ms-if="!choosing&&id!=null&&viewMode=='newEvent'" ms-click="loadMyEvents">选择其他事件</a>
                 <div class="eventChange" ms-if="choosing">选择一个事件</div>
@@ -179,11 +182,11 @@
 
                         <div id="pieces">
                             <div ms-each-piece="pieces"  data-each-rendered="pieceRendered">
-                                <a ms-attr-id="'piece'+($index+1)" ms-data-piece="piece" class="piece" ms-mouseenter="active(piece)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/piece/'+piece.id">
+                                <a ms-attr-id="'piece'+($index+1)" ms-data-piece="piece" class="piece invisible" ms-mouseenter="active(piece)" ms-mouseleave="unactive" ms-attr-href="'/event/'+getEventId()+'/piece/'+piece.id">
                                     <div class="cover" ms-if="piece.cover" ><img ms-src="baseUrl+'image/thumb/'+piece.cover"/></div>
                                     <div class="title">{{piece.title}}</div>
                                     <div class="text">{{piece.content|stripHTML|truncate(140,"...")}}</div>
-                                    <div class="more">!</div>
+                                    <!-- <div class="more">!</div> -->
                                 </a>
                             </div>
 

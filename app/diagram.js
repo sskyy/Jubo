@@ -19,7 +19,7 @@ define([], function() {
             pieceLineOffset : 50,
             currentMetricColor : "#9AC600",
             metricColor : "#ddd",
-            metricColors :["#9AC600","#18b6b9","#b7dad3","#d6d2a2","#e8ab79"],
+            metricColors :["#9AC600","#cc8a87","#33655a","#d3b942","#b7dad3","#b7dad3"],
             hCanvas : 620}
 
     var calDiagramArgs = function(event){
@@ -312,7 +312,7 @@ define([], function() {
                     stroke: diagramArgs.metricColor,
                     strokeWidth: 5,
                     r:4,
-                    strokeOpacity : 0.1,
+                    strokeOpacity : 0.5,
                     fill : 'none'
                 },opt))
             }
