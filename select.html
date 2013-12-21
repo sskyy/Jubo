@@ -13,6 +13,7 @@
     <script src="./lib/dropzone.js"></script>
     <link href="./css/main.css" type="text/css" rel="stylesheet"/>
     <link href="./lib/pen/pen.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="./lib/font-awesome/css/font-awesome.min.css">
     <style>
     [ms-controller]{
         display: none;
@@ -147,7 +148,7 @@
                     <a class="delete" ms-if="isAuthor" ms-click="deleteEvent">删除</a>
                 </div>
 
-                <div id="MeventTutorial" ms-if="viewMode=='event'&&pieces.length==0" ><a href="/create/piece">创建第一个片段</a></div>
+                <div id="MeventTutorial" ms-if="viewMode=='event'&&pieces.length==0" ><i class="fa fa-plus-square"></i><a href="/create/piece">创建第一个片段</a></div>
 
                 <a class="eventChange" ms-if="!choosing&&id!=null&&viewMode=='newEvent'" ms-click="loadMyEvents">选择其他事件</a>
                 <div class="eventChange" ms-if="choosing">选择一个事件</div>
@@ -210,7 +211,11 @@
         <div id="events" class="Mpage Mevents" ms-class="show:viewMode=='all'" ms-controller="events" ms-each-event="events">
             <div class="event">
                 <div><a class="eventTitle" ms-href="/event/{{event.id}}">{{event.title}}</a></div>
+                <div class="eventInfo">
+                    <i class="fa fa-user"></i><span class="eventAuthor">{{event.author.name}}</span><span>
+                    <i class="fa fa-clock-o"></i>{{event.createdAt|date}}</span></div>
                 <div><a class="eventIntro" ms-href="/event/listVm">{{event.content}}</a></div>
+                <div class="eventMetrics" ms-with="metrics"><span>{{$key}}</span></div>
             </div>
         </div>
 

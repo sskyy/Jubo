@@ -1,7 +1,7 @@
 define(['./util','./global'], function(util,Global) {
     var exports = {},
         baseUrl = Global.baseUrl,
-        allAddr = baseUrl + "event",
+        rankingAddr = baseUrl + "event/ranking",
         myEventsAddr = baseUrl + "event/myEvents"
 
     exports.allVm = (function(){
@@ -12,7 +12,7 @@ define(['./util','./global'], function(util,Global) {
                     vm.events =[]
                     vm.get = function(){
                         return util.api({
-                            url:allAddr,
+                            url:rankingAddr,
                         }).done(function(data){
                             vm.events = data
                         })

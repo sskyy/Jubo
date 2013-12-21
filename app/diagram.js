@@ -144,31 +144,34 @@ define([], function() {
         } catch (e) {
         }
 
-        var d = 0,
-            scrollMaxWidth = 0
+        var domRef = document.querySelector(defaults.diagramContainerSelector)
+        scrollMaxWidth = 0
 
         document.addEventListener(eventName, function(e) {
             if ( hasScroll && inDiagramArea(e) && viewMode == 'event') { // 只有滚动条出现时才进入此分支
                 //stop y scroll
-                console.log("we take over scroll",hasScroll,inDiagramArea(e),viewMode)
                 e.preventDefault()
                 e.stopPropagation()
-                if (eventName == "DOMMouseScroll") {
-                    d += (e.detail / 3)
-                } else {//如果滚得太快，会出现240， 360等值，全部统一为-1与1
-                    d += e.wheelDelta > 0 ? -1 : 1
-                }
+                var unit = 0,
+                    scrollWidth = 0,
+                    speed = 15
 
-                var t = Math.floor(d * 15)
-                if (t >= scrollMaxWidth) {
-                    --d
-                    return
+
+                if (eventName == "DOMMouseScroll") {
+                    unit = (e.detail / 3)
+                } else {//如果滚得太快，会出现240， 360等值，全部统一为-1与1
+                    unit = e.wheelDelta > 0 ? -1 : 1
                 }
-                if (t < 0) {
-                    ++d
-                    return
+                scrollWidth = Math.floor( unit * speed)
+
+                if( domRef.scrollLeft + scrollWidth > scrollMaxWidth ){
+                    domRef.scrollLeft = scrollMaxWidth
+                }else if( domRef.scrollLeft + scrollWidth < 0){
+                    domRef.scrollLeft= 0
+                }else{
+                    domRef.scrollLeft += scrollWidth
                 }
-                document.querySelector(defaults.diagramContainerSelector).scrollLeft = t
+                
             }
         })
 
@@ -176,7 +179,7 @@ define([], function() {
             viewMode = vMode
             hasScroll = args.wDiagram < args.wPieces ? true : false
             scrollMaxWidth = hasScroll ? args.wPieces - args.wDiagram : 0
-            console.log("bind wheel Event",args.wDiagram,args.wPieces)
+            console.log("bind wheel Event",args.wDiagram,args.wPieces,args.wDiagram-args.wPieces)
 
         }
 
@@ -188,7 +191,8 @@ define([], function() {
         var pieces = document.querySelectorAll(diagramArgs.pieceSelector),
             isShortcutModel = (viewMode!="event") ? true:false,
             positionKey = isShortcutModel ? 'shortcut-position' : 'position',
-            $pieces = $(diagramArgs.piecesSelector)
+            $pieces = $(diagramArgs.piecesSelector),
+            diagramContainer = document.querySelector(defaults.diagramContainerSelector)
 
         $pieces.width(diagramArgs.wPieces)
         if( !isShortcutModel ){
@@ -201,6 +205,7 @@ define([], function() {
             $pieces.height( _.reduce(pieces,function(memo,piece){
                 return memo + $(piece).outerHeight() + 10
             },0))
+            diagramContainer.scrollLeft = 0
         }
         
         console.log("DEB: rendering DOM", pieces.length,diagramArgs.wPieces, positionKey)
@@ -278,7 +283,7 @@ define([], function() {
                     },$(piece).data(positionKey)?$(piece).data(positionKey)[event.currentMetric]: {top:10}))
             }else{
                 $(piece).css( _.extend({
-                    left : 0
+                    left : 10
                 },$(piece).data(positionKey) ))
             }
         })
