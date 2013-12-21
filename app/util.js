@@ -66,12 +66,12 @@ define(['./global'], function(Global) {
                 refreshToken = refreshToken || false
 
             function wrapOpt( opt ){
-                if( !opt.type || /post/i.test(!opt.type)){
-                    return opt
+                if( opt.type && /post/i.test(opt.type)){
+                    opt.headers = _.extend({
+                        "X-CSRF-Token":token
+                    },opt.headers||{})
                 }
-                opt.headers = _.extend({
-                    "X-CSRF-Token":token
-                },opt.headers||{})
+
                 return _.extend(opt,{
                     crossDomain: true,
                     xhrFields: {

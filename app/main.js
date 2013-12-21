@@ -39,6 +39,43 @@ define(['./event','./create','./login','./list','./util','./global'], function( 
         vm.getPieceId = function(){
             return eventVm.getPieceId()
         }
+        vm.getUser = function(){
+            var q = $.Deferred()
+            if( vm.user.id ){
+                q.resolve(vm.user.$model)
+            }else{
+                vm.autoLogin().done(function( user ){
+                    q.resolve(user)
+                }).fail(function(){
+                    console.log("user have no session,need manully login")
+                    q.reject()
+                })
+            }
+
+            return q
+        }
+        vm.autoLogin = (function(){
+            var loginDefer
+            return function(){
+                if( loginDefer ){
+                    return loginDefer
+                }
+
+                loginDefer = $.Deferred()
+                loginVm.whoami().done(function( user ){
+                    if( user && user.id != 0){
+                        _.extend(vm.user , user)
+                        loginDefer.resolve(user)
+                    }else{
+                        loginDefer.reject()
+                    }
+                }).fail(function(data){
+                    loginDefer.reject()
+                    console.log("ERR: whoami failed", data)
+                })
+                return loginDefer
+            }
+        })()
     })
 
 
@@ -47,18 +84,25 @@ define(['./event','./create','./login','./list','./util','./global'], function( 
         createVm = Create.newPieceVm(generalVm),
         createEvent = Create.newEventVm(),
         loginVm = Login.vmodel( generalVm ),
-        listVm  = List.vmodel()
+        allVm  = List.allVm(),
+        myEventsVm  = List.myEventsVm(generalVm)
 
 
 
     exports.run = function(){
-        
         avalon.scan()
         //页面元素的显示状态都由全局的viewMode控制。login之类的弹窗由modalMode控制。
         //页面的改变都由路径控制。
         page("/event/list",function(){
             generalVm.changeView("all")
-            listVm.get().done(function(){
+            allVm.get().done(function(){
+                generalVm.landing = false
+            })
+        })
+
+        page("/event/mine",function(){
+            generalVm.changeView("myEvents")
+            myEventsVm.get().done(function(){
                 generalVm.landing = false
             })
         })
@@ -97,6 +141,8 @@ define(['./event','./create','./login','./list','./util','./global'], function( 
 
         page(window.location.search.replace("?q=",""))
 
+        //general logic
+        generalVm.autoLogin()
 
     } 
 

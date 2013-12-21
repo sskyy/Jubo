@@ -110,11 +110,26 @@ a {
 
 .Mpage{
     display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
     margin: 0;
     padding: 0;
     overflow-y: auto;
+    height: 100%;
+    width: 100%;
     &.show{
         display: block;
+    }
+    .MpageMessage{
+        position: absolute;
+        top: 50%;
+        width : 100%;
+        margin-top: -15px;
+        text-align: center;
+        height: 30px;
+        color:#999;
+        font-style: italic;
     }
 }
 
@@ -272,8 +287,41 @@ html,body{
     }
     .navs{
         position: absolute;
-        bottom: 20px;
+        bottom: 60px;
         right:0px;
+
+        a{
+            &.viewMode{
+                text-decoration: none;
+                color:#999;
+                display: block;
+                padding: 10px;
+                padding-right: 20px;
+                font-size:24px;
+                font-weight: bolder;
+                margin-bottom: 30px;
+                text-align: right;
+                text-shadow:1px 1px 1px #222;
+                text-decoration: none solid rgb(153, 153, 153);
+                &:hover{
+                    color:#fff;
+                    text-shadow:1px 1px 1px #111;
+                }
+                &.active{
+                    color:#fff;
+                    text-shadow:1px 1px 1px #111;
+                }
+                &.subnav{
+                    font-size: 18px;
+                    margin-bottom: 0;
+                    padding: 5px 20px 0 5px;
+                }
+                &.navhead{
+                    margin-bottom: 0;
+                }
+            }
+        }
+
     }
 }
 
@@ -285,6 +333,7 @@ html,body{
     overflow-y: hidden;
     box-shadow: -2px 0 2px #333;
 }
+
 
 
 #Mevent{
@@ -986,26 +1035,6 @@ a.piece{
 }
 
 
-a.viewMode{
-    text-decoration: none;
-    color:#999;
-    display: block;
-    padding: 10px;
-    padding-right: 20px;
-    font-size:24px;
-    font-weight: bolder;
-    margin-bottom: 20px;
-    text-align: right;
-    text-shadow:1px 1px 1px #222;
-    text-decoration: none solid rgb(153, 153, 153);
-    &:hover{
-        color:#fff;
-        text-shadow:1px 1px 1px #111;
-
-        // background: #333;
-    }
-}
-
 #newPieceAlbum{
     margin: 10px 0;
 
@@ -1081,14 +1110,12 @@ a.viewMode{
     }
 }
 
-#events{
+
+.Mevents{
     height: 100%;
     width: 100%;
     padding-top: 20px;
     background: #ededef;
-    position: absolute;
-    top: 0;
-    left: 0;
     &.show{
         display: block;
     }

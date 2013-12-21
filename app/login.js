@@ -45,7 +45,7 @@ define(['./util','./global'], function(Util,Global) {
                         }).fail(function( res,status, msg ){
                             console.log( "SUS: Login failed")
                             vm.connecting = true
-                            if( res.status == 401){
+                            if( res.status == 404){
                                 vm.message = "用户名或密码错误"
                             }else{
                                 vm.message = "服务器错误"
@@ -106,17 +106,7 @@ define(['./util','./global'], function(Util,Global) {
                 })   
 
                 // init user
-                console.log("DEB: checking current user")
-                loginVm.whoami().done(function( user ){
-                    if( user.id != 0){
-                        _.extend(general.user , user)
-                        console.log("DEB: Hello ", user.name)
-                    }else{
-                        console.log("DEB: current user not login")
-                    }
-                }).fail(function(data){
-                    console.log("ERR: whoami failed", data)
-                })
+
 
                 //test for register
                 // loginVm.regName = "root"
