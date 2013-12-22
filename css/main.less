@@ -391,10 +391,26 @@ html,body{
     }
 
     .intro{
-        font-size: 14px;
-        color:#878787;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color:#555;
         line-height: 20px;
         line-height: 160%;
+    }
+    .author{
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 14px;
+        color: #999;
+        span{
+            line-height: 30px;
+            vertical-align: top;
+        }
+        img{
+            width: 30px;
+        }
     }
 
     .delete{
@@ -403,6 +419,26 @@ html,body{
         top : 16px;
         cursor: pointer;
         font-size: 12px;
+    }
+    .footer{
+        font-size: 14px;
+        color: #999;
+        line-height: 14px;
+        a.operation{
+            line-height: 14px;
+            display: inline-block;
+            margin-right: 10px;
+            float: right;
+            color:#999;
+            i{
+                margin-right: 0px;
+            }
+            &:hover{
+                text-decoration: none;
+                cursor: pointer;
+                color:#333;
+            }
+        }
     }
 }
 

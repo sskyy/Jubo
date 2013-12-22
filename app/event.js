@@ -5,6 +5,7 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
         eventAddr = baseUrl+"event/eventWithPieces/",
         // myEventsAddr = baseUrl+"me/event",
         myEventsAddr = baseUrl+"event/",
+        voteAddr = baseUrl + "vote/toEvent/",
         eventDeleteAddr = baseUrl + "event/delete/"
         piecesAddr = baseUrl+"piece/piecesById"
 
@@ -110,10 +111,13 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                     vm.metircsKeys = []
                     vm.title = null
                     vm.content = null
+                    vm.createdAt = null
+                    vm.vote = 0
                     vm.currentMetric = null
                     vm.currentPiece = null
                     vm.id = null
                     vm.uid = null
+                    vm.author = {}
                     vm.myEvents = []
                     vm.choosing = false
                     vm.loading = false
@@ -177,7 +181,7 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                         vm.metricKeys = metricKeys
                         vm.pieces = standardFiels[1]
                         vm.currentMetric = event.args.defaultMetric || metricKeys[0]
-                        _.extend( vm, _.pick(event,'id','title','content','uid') )
+                        _.extend( vm, _.pick(event,'id','title','content','uid','createdAt','author','vote') )
                     }
                     vm.setCurrentMetric = function( metricName){
                         vm.currentMetric = metricName
@@ -216,6 +220,15 @@ define(['./diagram','./piece','./util','./global'], function(Diagram,Piece,Util,
                                 page("/")
                             })
                         }
+                    }
+                    vm.ivote = function(){
+                        Util.api({
+                            url : voteAddr + vm.id
+                        }).done(function(){
+                            vm.vote++
+                        }).fail(function(data){
+                            console.log("vote failed",data)
+                        })
                     }
                 })
                 //add in

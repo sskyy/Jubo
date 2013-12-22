@@ -150,8 +150,19 @@
             <div id="overview" ms-class="shortcut:viewMode=='piece'||viewMode=='newPiece'">
                 <div class="MeventBrief" ms-if="!choosing">
                     <a class="title" ms-href="/event/{{id}}">{{title}}</a>
+                    <div class="author">
+                        <span>{{author.name}}</span>
+                        <img ms-src='author.avatar'>
+                    </div>
                     <div class="intro">{{content}}</div>
-                    <a class="delete" ms-if="isAuthor" ms-click="deleteEvent">删除</a>
+                    <div class="footer">
+                        <i class="fa fa-clock-o"></i><span class="time">{{createdAt|date}}</span>
+                        <a class="operation" ms-if="isAuthor" ms-click="deleteEvent">删除</a>
+                        <a class="operation" ms-if="isAuthor" ms-click="ivote">
+                            <i class="fa fa-thumbs-o-up"></i>
+                            <span>({{vote}})</span>
+                        </a>
+                    </div>
                 </div>
 
                 <div id="MeventTutorial" ms-if="viewMode=='event'&&pieces.length==0" >
@@ -164,6 +175,7 @@
                 <div class="Mloading" ms-if="choosing&&!myEvents.length">正在载入数据...</div>
                 <div id="myEvents" ms-if="choosing" ms-each-myevent = "myEvents">
                     <div class="MeventBrief">
+                    .
                         <a id="title" class"eventTitle" ms-click="loadEvent(myevent.id)">{{myevent.title}}</a>
                     </div>
                 </div>
