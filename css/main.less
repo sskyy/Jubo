@@ -175,8 +175,18 @@ input[type="text"],input[type="password"]{
         margin-bottom: 10px;
     }
     .body{
-        // display: none;
+        display: none;
+        &.show{
+            display: block;
+        }
     }
+    .hint{
+        font-size: 14px;
+        color: #999;
+        text-align: center;
+        line-height: 40px;
+    }
+
     .message{
         line-height: 20px;
         height: 20px;
@@ -1127,6 +1137,13 @@ a.piece{
     color:#555;
     .inputTypical{
         width: 220px;
+    }
+    .snsLogos{
+        text-align: center;
+        a{
+            display: inline-block;
+            margin: 0 10px;
+        }
     }
 }
 

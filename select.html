@@ -24,7 +24,13 @@
     <div id="login" class="Mmodal"  ms-controller="login" ms-if="modalMode=='login'&&user.id==0">
         <a class="close" ms-click="changeModal">X</a>
         <div class="header">登录/注册</div>
-        <div class="body" ms-class="hide:regMode">
+        <div class="body" ms-class="show:loginMode=='oauth'">
+            <div class="hint">请使用社交账号登陆</div>
+            <div class="snsLogos">
+                <a href="https://www.douban.com/service/auth2/auth?client_id=0be4d525ee8ea80523ae7f71cbabf80f&redirect_uri=http://127.0.0.1:1337/oauth/douban&response_type=code"><img src="/public/sns/douban_48x48.png"></a>
+            </div>
+        </div>
+        <div class="body" ms-class="show:loginMode=='local'">
             <div class="message" ms-class="show:message">{{message}}</div>
             <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="name"></div>
             <div class="row"><span class="MinputLabel">密码</span><input class="inputTypical"  ms-duplex="password" type="password" ms-keypress="keypress($event)"></div>
@@ -33,7 +39,7 @@
                 <a class="right" ms-click='changeRegMode(true)'>注册<i class="fa fa-long-arrow-right"></i></a>
             </div>
         </div>
-        <div class="body" ms-class="hide:!regMode">
+        <div class="body" ms-class="show:loginMode=='register'">
             <div class="message" ms-class="show:RegMessage">{{regMessage}}</div>
             <div class="row"><span class="MinputLabel">用户名</span><input class="inputTypical" type="text" ms-duplex="regName"></div>
             <div class="row"><span class="MinputLabel">邮箱</span><input class="inputTypical" type="text" ms-duplex="regEmail"></div>

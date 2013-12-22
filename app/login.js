@@ -18,7 +18,7 @@ define(['./util','./global'], function(Util,Global) {
                     vm.name = ""
                     vm.password = ""
                     vm.message = ""
-                    vm.regMode = false
+                    vm.loginMode = 'oauth'
                     vm.regName = ""
                     vm.regPassword = ""
                     vm.regEmail = ""
@@ -99,9 +99,8 @@ define(['./util','./global'], function(Util,Global) {
                             dataType:'json',
                         })
                     }
-                    vm.changeRegMode = function( regMode ){
-                        vm.regMode = regMode || false
-                        console.log( "regMode",regMode )
+                    vm.changeLoginMode = function( mode ){
+                        vm.loginMode = mode || 'oatuh'
                     }
                 })   
 

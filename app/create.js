@@ -31,6 +31,8 @@ define(['./util','./global'], function(Util,Global) {
                     addRemoveLinks : true,
                     previewsContainer : albumPreivewSelector,
                     clickable: true,
+                    thumbnailWidth: 180,
+                    thumbnailHeight: 100,
                     dictRemoveFile : '删除',
                     dictDefaultMessage :'上传图片',
                     dictCancelUpload : '取消',
