@@ -1,7 +1,7 @@
 define(['./util','./global'], function(util,Global) {
     var exports = {},
         baseUrl = Global.baseUrl,
-        rankingAddr = baseUrl + "event/ranking",
+        rankingAddr = baseUrl + "heat/board",
         myEventsAddr = baseUrl + "event/myEvents"
 
     exports.allVm = (function(){
