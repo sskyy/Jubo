@@ -84,7 +84,7 @@ define(['./event','./create','./login','./list','./util','./global'], function( 
         createVm = Create.newPieceVm(generalVm),
         createEvent = Create.newEventVm(),
         loginVm = Login.vmodel( generalVm ),
-        allVm  = List.allVm(),
+        listVm  = List.listVm(),
         myEventsVm  = List.myEventsVm(generalVm)
 
 
@@ -93,9 +93,16 @@ define(['./event','./create','./login','./list','./util','./global'], function( 
         avalon.scan()
         //页面元素的显示状态都由全局的viewMode控制。login之类的弹窗由modalMode控制。
         //页面的改变都由路径控制。
-        page("/event/list",function(){
+        page("/event/board",function(){
             generalVm.changeView("all")
-            allVm.get().done(function(){
+            listVm.get('board').done(function(){
+                generalVm.landing = false
+            })
+        })
+
+        page("/event/newest",function(){
+            generalVm.changeView("all")
+            listVm.get('newest').done(function(){
                 generalVm.landing = false
             })
         })

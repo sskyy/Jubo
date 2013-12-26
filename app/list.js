@@ -1,18 +1,22 @@
 define(['./util','./global'], function(util,Global) {
     var exports = {},
         baseUrl = Global.baseUrl,
-        rankingAddr = baseUrl + "heat/board",
+        listAddr= {
+            'board' : baseUrl + "heat/board",
+            'newest' : baseUrl + "event/newest",
+        }
+        rankingAddr = 
         myEventsAddr = baseUrl + "event/myEvents"
 
-    exports.allVm = (function(){
+    exports.listVm = (function(){
         var allVm
         return function(){
             if( !allVm ){
                 allVm = avalon.define("events",function(vm){
                     vm.events =[]
-                    vm.get = function(){
+                    vm.get = function(type){
                         return util.api({
-                            url:rankingAddr,
+                            url:listAddr[type],
                         }).done(function(data){
                             vm.events = data
                         })

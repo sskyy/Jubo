@@ -213,62 +213,55 @@ define([], function() {
         //caculate positions
         if( pieces.length > 1 && !$(pieces[0]).data(positionKey)){
             diagramArgs.piecesPos = []
-            if( !isShortcutModel ){
-                var metricsKeys = _.keys(event.metrics.$model)
-                for( var i=0,length=metricsKeys.length;i<length;i++ ){
-                    var metricName = metricsKeys[i],
-                        metricTop = event.metrics[metricName].top,
-                        metricBottom = event.metrics[metricName].bottom,
-                        metricRange = metricTop - metricBottom,
-                        tempbottomDomHeight = 330,
-                        bottomDomHeight = $(_.max( _.map( pieces, function( piece){
-                            // console.log( "max ",metricTop , piece['data-piece'].metrics[metricName] )
-                            var bottom = (metricTop - piece['data-piece'].metrics[metricName])*(diagramArgs.hContainer-tempbottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-tempbottomDomHeight) 
-                                + $(piece).outerHeight()
-                            return [piece, bottom]
-                        }),function(pieceWithbottom){
-                            return pieceWithbottom[1]
-                        })).outerHeight()
+            //caculate for unshortcut model
+            var metricsKeys = _.keys(event.metrics.$model)
+            for( var i=0,length=metricsKeys.length;i<length;i++ ){
+                var metricName = metricsKeys[i],
+                    metricTop = event.metrics[metricName].top,
+                    metricBottom = event.metrics[metricName].bottom,
+                    metricRange = metricTop - metricBottom,
+                    tempbottomDomHeight = 330,
+                    bottomDomHeight = $(_.max( _.map( pieces, function( piece){
+                        // console.log( "max ",metricTop , piece['data-piece'].metrics[metricName] )
+                        var bottom = (metricTop - piece['data-piece'].metrics[metricName])*(diagramArgs.hContainer-tempbottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-tempbottomDomHeight) 
+                            + $(piece).outerHeight()
+                        return [piece, bottom]
+                    }),function(pieceWithbottom){
+                        return pieceWithbottom[1]
+                    })).outerHeight()
 
-                        console.log( "bottom", metricName, bottomDomHeight)
+                    // console.log( "bottom", metricName, bottomDomHeight)
+                
+                _.each(pieces, function( piece, j){
+                    var pieceVm = piece['data-piece'],
+                        pieceMetric = pieceVm.metrics[metricName],
+                        position = $(piece).data(positionKey) || {}
 
-                    
-                    _.each(pieces, function( piece, j){
-                        var pieceVm = piece['data-piece'],
-                            pieceMetric = pieceVm.metrics[metricName],
-                            position = $(piece).data(positionKey) || {}
-
-                        position[metricName] = {
-                            left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2,
-                            top : (metricTop - pieceMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
-                        }
-                        // console.log("DEB: setting position for", positionKey,position)
-                        if( position[metricName].top > 1000){
-                            console.log( piece, metricTop , pieceMetric, diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom,metricTop-metricBottom,metricTop,metricBottom )
-                        }
-                        $(piece).data(positionKey, position)
-
-                        // pieceVm.el = {position:position}
-                        // console.log("i",i)
-                        if( i == length-1 ){
-                            // console.log("DEB: setting position for piece", positionKey,position)
-                            diagramArgs.piecesPos.push( position )
-                        }
-                    })
-                }
-                console.log("DEB: NOT shortcut model", viewMode, diagramArgs.piecesPos)
-            }else{
-                var stack = 0    
-                _.each(pieces, (function( piece, i ){
-                    return function( piece, i){
-                        $(piece).data(positionKey, {
-                            top: stack
-                        })
-                        stack += $(pieces[i]).outerHeight() + 10
+                    position[metricName] = {
+                        left : j*diagramArgs.wUnit + (diagramArgs.wUnit-diagramArgs.wPiece)/2,
+                        top : (metricTop - pieceMetric)*(diagramArgs.hContainer-bottomDomHeight-diagramArgs.hContainerbottom)/(metricTop-metricBottom)
                     }
-                })())
-                console.log("DEB: shortcut model")
+                    
+                    $(piece).data('position', position)
+
+                    if( i == length-1 ){
+                        // console.log("DEB: setting position for piece", positionKey,position)
+                        diagramArgs.piecesPos.push( position )
+                    }
+                })
             }
+
+            //caculate for shortcut model
+            var stack = 0    
+            _.each(pieces, (function( piece, i ){
+                return function( piece, i){
+                    $(piece).data('shortcut-position', {
+                        top: stack
+                    })
+                    stack += $(pieces[i]).outerHeight() + 10
+                }
+            })())
+            console.log("DEB: shortcut model")
         }else{
             if( pieces.length !=0 && $(pieces[0]).data(positionKey)){
                 console.log("DEB: piece Dom aready have position", viewMode, positionKey)

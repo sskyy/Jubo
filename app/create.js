@@ -4,7 +4,7 @@ define(['./util','./global'], function(Util,Global) {
         pieceContentSelector="#newPieceContent",
         pieceMenuSelector = "#newPieceMenu",
         previewSelector = "#newPiecePreview",
-        albumUploadSelector = "#newPieceAlbum",
+        albumUploadSelector = "#newPieceAlbumHandler",
         albumPreivewSelector = "#newPieceAlbumPreview",
         pieceCoverClass= "pieceCover",
         eventAddr = baseUrl+"event",

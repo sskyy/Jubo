@@ -662,6 +662,11 @@ a.piece{
              -o-transition: top left .25s;
                 transition: top left .25s;
         }
+        .footer{
+            a.operation{
+                margin-right:2px;
+            }
+        }
     }    
     #metrics{
         text-align: center;
@@ -842,7 +847,7 @@ a.piece{
                     color: #555;
                     font-size: 18px;
                     line-height: 18px;
-                    width: 40px;
+                    width: 60px;
                     vertical-align: bottom;
                     display: inline-block;
                 }
@@ -1047,12 +1052,17 @@ a.piece{
             }
         }
         #newPieceAlbum{
-            background: #9AC600;
             width: 100%;
             padding: 30px 0;
             color: #fff;
             font-size: 20px;
             text-align: left;
+            #newPieceAlbumHandler{
+                text-align: center;
+                font-size: 14px;
+                color :#888;
+                cursor:pointer;
+            }
             .dz-preview{
                 display: inline-block;
                 margin: 10px;
@@ -1075,7 +1085,7 @@ a.piece{
                 }
                 &.pieceCover{
                     img{
-                        outline: 3px #fff solid;
+                        outline: 3px #9AC600 solid;
                     }
                 }
             }

@@ -27,7 +27,8 @@
         <div class="body" ms-class="show:loginMode=='oauth'">
             <div class="hint">请使用社交账号登陆</div>
             <div class="snsLogos">
-                <a href="https://www.douban.com/service/auth2/auth?client_id=0be4d525ee8ea80523ae7f71cbabf80f&redirect_uri=http://127.0.0.1:1337/oauth/douban&response_type=code"><img src="/public/sns/douban_48x48.png"></a>
+                <a href="https://www.douban.com/service/auth2/auth?client_id=0be4d525ee8ea80523ae7f71cbabf80f&redirect_uri=http://www.buxiache.com:1337/oauth/douban&response_type=code"><img src="/public/sns/douban_48x48.png"></a>
+                <a href="https://api.weibo.com/oauth2/authorize?client_id=2773636773&response_type=code&redirect_uri=http://www.buxiache.com:1337/oauth/weibo"><img src="/public/sns/weibo_48x48.png"></a>
             </div>
         </div>
         <div class="body" ms-class="show:loginMode=='local'">
@@ -61,7 +62,9 @@
 
         </div>
         <div class="navs">
-            <a class="viewMode" ms-class="active:viewMode=='all'" href="/event/list">时光旅行</a>
+            <a class="viewMode navhead" ms-class="active:viewMode=='all'" href="/event/board">时光旅行</a>
+            <a class="viewMode subnav" ms-class="active:viewMode=='newEvent'" href="/event/board">榜单</a>
+            <a class="viewMode subnav" ms-class="active:viewMode=='newPiece'" href="/event/newest">最新</a>
             <a class="viewMode navhead" ms-class="active:viewMode=='myEvents'" href="/event/mine">我的世界</a>
             <a class="viewMode subnav" ms-class="active:viewMode=='newEvent'" href="/create/event">创建事件</a>
             <a class="viewMode subnav" ms-class="active:viewMode=='newPiece'" href="/create/piece">创建片段</a>
@@ -122,6 +125,7 @@
                     <div id="newPieceForm">
                         <input type="text" id="newPieceTitle" placeholder="标题" ms-duplex="newTitle">
                         <div id="newPieceAlbum">
+                            <div id="newPieceAlbumHandler"><i class="fa fa-plus-square"></i>上传图片建立相册</div>
                             <div id="newPieceAlbumPreview"></div>
                         </div>
                         <div id="newPieceMenu"></div>
@@ -150,7 +154,7 @@
             <div id="overview" ms-class="shortcut:viewMode=='piece'||viewMode=='newPiece'">
                 <div class="MeventBrief" ms-if="!choosing">
                     <a class="title" ms-href="/event/{{id}}">{{title}}</a>
-                    <div class="author">
+                    <div class="author" ms-if="viewMode=='event'">
                         <span>{{author.name}}</span>
                         <img ms-src='author.avatar'>
                     </div>
